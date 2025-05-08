@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messages - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3"><i class="fas fa-envelope me-2"></i>Messages</h1>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                {% if conversations is empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5>No messages yet</h5>
+                        <p class="text-muted">You don't have any conversations. Start connecting with others to begin messaging!</p>
+                        <a href="{{ path('app_skills') }}" class="btn btn-primary">
+                            <i class="fas fa-users me-2"></i>Find Users
+                        </a>
+                    </div>
+                {% else %}
+                    {% for conversation in conversations %}
+                        <a href="{{ path('app_message_conversation', {'username': conversation.partner.username}) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center p-3 {% if conversation.unread_count > 0 %}bg-light{% endif %}">
+                            <div class="position-relative me-3">
+                                {% if conversation.partner.avatar %}
+                                    <img src="{{ conversation.partner.avatar }}" alt="{{ conversation.partner.username }}" 
+                                         class="rounded-circle" width="50" height="50">
+                                {% else %}
+                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                         style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                        {{ conversation.partner.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if conversation.unread_count > 0 %}
+                                    <span class="position-absolute bottom-0 end-0 translate-middle badge rounded-pill bg-danger">
+                                        {{ conversation.unread_count }}
+                                        <span class="visually-hidden">unread messages</span>
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex-grow-1 min-width-0">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0 text-truncate">
+                                        {% if conversation.partner.firstName and conversation.partner.lastName %}
+                                            {{ conversation.partner.firstName }} {{ conversation.partner.lastName }}
+                                        {% else %}
+                                            {{ conversation.partner.username }}
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted ms-2">
+                                        {{ conversation.latest_message.timestamp|date('M j, g:i a') }}
+                                    </small>
+                                </div>
+                                <p class="mb-0 text-truncate text-muted small">
+                                    {% if conversation.latest_message.sender.id == app.user.id %}
+                                        <span class="text-muted">You: </span>
+                                    {% endif %}
+                                    {{ conversation.latest_message.content }}
+                                </p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .min-width-0 {
+        min-width: 0;
+    }
+</style>
+{% endblock %} 

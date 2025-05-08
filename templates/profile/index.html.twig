@@ -1,0 +1,262 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Profile - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="profile-header card shadow-sm mb-4 p-4">
+    <div class="row align-items-center">
+        <div class="col-md-4 text-center text-md-start">
+            <div class="mb-3 mx-auto">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar }}" alt="{{ user.username }}" class="profile-image rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="profile-image rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 150px; height: 150px; font-size: 3rem; margin: 0 auto;">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="profile-info">
+                <h1 class="display-5 fw-bold">
+                    {% if user.firstName and user.lastName %}
+                        {{ user.firstName }} {{ user.lastName }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </h1>
+                <div class="profile-meta mb-3">
+                    <div class="meta-item mb-2">
+                        <i class="fas fa-user me-2"></i> <span class="fw-medium">{{ user.username }}</span>
+                    </div>
+                    <div class="meta-item mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i> 
+                        <span>{{ user.location ?? 'No location specified' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar me-2"></i> <span>Member since {{ user.createdAt|date('M Y') }}</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Bio Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">About Me</h5>
+            </div>
+            <div class="card-body">
+                {% if user.bio %}
+                    <p>{{ user.bio }}</p>
+                {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-edit text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">No bio provided yet.</p>
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i> Add Bio
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Offered Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Skills I Offer</h5>
+                <a href="{{ path('app_profile_edit', {'_fragment': 'skills'}) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i> Add
+                </a>
+            </div>
+            <div class="card-body">
+                {% if user.skillsOffered is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-chalkboard-teacher text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">You haven't added any skills you can teach yet.</p>
+                        <a href="{{ path('app_profile_edit', {'_fragment': 'skills'}) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i> Add Skills
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="skills-list">
+                        {% for skillOffered in user.skillsOffered %}
+                            <span class="badge bg-primary rounded-pill p-2 px-3 m-1">{{ skillOffered }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Wanted Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Skills I Want to Learn</h5>
+                <a href="{{ path('app_profile_edit', {'_fragment': 'skills'}) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i> Add
+                </a>
+            </div>
+            <div class="card-body">
+                {% if user.skillsWanted is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-graduation-cap text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">You haven't added any skills you want to learn yet.</p>
+                        <a href="{{ path('app_profile_edit', {'_fragment': 'skills'}) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i> Add Skills
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="skills-list">
+                        {% for skillWanted in user.skillsWanted %}
+                            <span class="badge bg-secondary rounded-pill p-2 px-3 m-1">{{ skillWanted }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Availability Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">My Availability</h5>
+                <a href="{{ path('app_profile_edit', {'_fragment': 'availability'}) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+            </div>
+            <div class="card-body">
+                {% if user.availabilities is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-alt text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">You haven't set your availability yet.</p>
+                        <a href="{{ path('app_profile_edit', {'_fragment': 'availability'}) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1"></i> Set Availability
+                        </a>
+                    </div>
+                {% else %}
+                    <ul class="list-group list-group-flush">
+                        {% for availability in user.availabilities %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                    <strong>{{ days[availability.dayOfWeek - 1] }}</strong>
+                                </div>
+                                <div>{{ availability.startTime|date('g:i A') }} - {{ availability.endTime|date('g:i A') }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Sessions Completed</div>
+                    <div class="fw-bold">0</div>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Skills Offered</div>
+                    <div class="fw-bold">{{ user.skillsOffered|length }}</div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>Skills Wanted</div>
+                    <div class="fw-bold">{{ user.skillsWanted|length }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Completion -->
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Profile Completion</h5>
+            </div>
+            <div class="card-body">
+                {% set completionScore = 0 %}
+                {% set completionTotal = 5 %}
+                {% if user.firstName and user.lastName %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.bio %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.skillsOffered is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.skillsWanted is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.availabilities is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                
+                {% set completionPercentage = (completionScore / completionTotal) * 100 %}
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: {{ completionPercentage }}%;" aria-valuenow="{{ completionPercentage }}" aria-valuemin="0" aria-valuemax="100">{{ completionPercentage|round }}%</div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0 d-flex align-items-center">
+                        <i class="fas {% if user.firstName and user.lastName %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-2"></i> 
+                        Basic info
+                    </li>
+                    <li class="list-group-item px-0 d-flex align-items-center">
+                        <i class="fas {% if user.bio %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-2"></i> 
+                        Bio
+                    </li>
+                    <li class="list-group-item px-0 d-flex align-items-center">
+                        <i class="fas {% if user.skillsOffered is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-2"></i> 
+                        Skills offered
+                    </li>
+                    <li class="list-group-item px-0 d-flex align-items-center">
+                        <i class="fas {% if user.skillsWanted is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-2"></i> 
+                        Skills wanted
+                    </li>
+                    <li class="list-group-item px-0 d-flex align-items-center">
+                        <i class="fas {% if user.availabilities is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-2"></i> 
+                        Availability
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Additional profile page styling */
+.profile-header {
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    margin-right: 1.5rem;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.progress {
+    height: 0.75rem;
+    border-radius: var(--border-radius);
+}
+</style>
+{% endblock %} 

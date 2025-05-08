@@ -1,0 +1,214 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SkillSwap - Exchange Skills for Free{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <h1>Share Skills, Change Lives</h1>
+    <p>
+        SkillSwap connects people who want to exchange skills for free. Teach what you know, learn what you don't. No money involved, just the joy of sharing knowledge.
+    </p>
+    <div class="hero-buttons">
+        {% if app.user %}
+            <a href="{{ path('app_skills') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Find Skills
+            </a>
+            <a href="{{ path('app_profile') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-user me-2"></i>My Profile
+            </a>
+        {% else %}
+            <a href="{{ path('app_register') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Join Now
+            </a>
+            <a href="{{ path('app_login') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="text-center mb-5">How SkillSwap Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon blue">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Create Your Profile</h3>
+                    <p>Sign up for free and list the skills you can teach and those you want to learn.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon purple">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Connect & Schedule</h3>
+                    <p>Find people with complementary skills, send messages, and schedule 1-on-1 sessions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card">
+                    <div class="feature-icon teal">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Learn & Teach</h3>
+                    <p>Meet online or in person, exchange knowledge, and leave reviews after your sessions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Users -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Featured Skill Sharers</h2>
+            <a href="{{ path('app_skills') }}" class="btn btn-outline-primary">
+                <i class="fas fa-users me-2"></i>View All
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% if featured_users is empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No users have joined yet. Be the first to share your skills!
+                    </div>
+                </div>
+            {% else %}
+                {% for user in featured_users %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card skill-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar bg-primary text-white me-3 rounded-circle" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                        {% if user.avatar %}
+                                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle" width="50" height="50">
+                                        {% else %}
+                                            {{ user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                        <div class="text-muted small">Member since {{ user.createdAt|date('M Y') }}</div>
+                                    </div>
+                                </div>
+                                
+                                {% if user.skillsOffered is not empty %}
+                                    <h6 class="mb-2">Skills Offered:</h6>
+                                    <div class="mb-3">
+                                        {% for skill in user.skillsOffered|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsOffered|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsOffered|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if user.skillsWanted is not empty %}
+                                    <h6 class="mb-2">Skills Wanted:</h6>
+                                    <div>
+                                        {% for skill in user.skillsWanted|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsWanted|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsWanted|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-outline-primary">View Profile</a>
+                                {% if is_granted('ROLE_USER') and app.user.id != user.id %}
+                                    <a href="#" class="btn btn-outline-success">Request Session</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Skill Categories -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Skill Categories</h2>
+            <a href="{{ path('app_skills') }}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>View All
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            {% if categories is empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No skill categories have been created yet.
+                    </div>
+                </div>
+            {% else %}
+                {% for category in categories %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card skill-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="text-primary me-3 fs-3">
+                                        {% if category.icon %}
+                                            <i class="{{ category.icon }}"></i>
+                                        {% else %}
+                                            <i class="fas fa-bookmark"></i>
+                                        {% endif %}
+                                    </div>
+                                    <h5 class="card-title mb-0">{{ category.name }}</h5>
+                                </div>
+                                
+                                {% if category.description %}
+                                    <p class="card-text text-muted mb-3">{{ category.description }}</p>
+                                {% endif %}
+                                
+                                {% if category.skills is not empty %}
+                                    <div>
+                                        {% for skill in category.skills|slice(0, 5) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if category.skills|length > 5 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ category.skills|length - 5 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted small">No skills listed in this category yet.</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_skills') }}" class="btn btn-outline-primary">View Skills</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-primary text-white text-center py-5">
+    <div class="container py-4">
+        <h2 class="fw-bold mb-3">Ready to Share Your Skills?</h2>
+        <p class="lead mb-4">Join SkillSwap today and become part of a growing community of skill sharers.</p>
+        {% if not app.user %}
+            <a href="{{ path('app_register') }}" class="btn btn-light btn-lg px-5">Get Started</a>
+        {% else %}
+            <a href="{{ path('app_skills') }}" class="btn btn-light btn-lg px-5">Explore Skills</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} 

@@ -1,0 +1,373 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Profile - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="mb-4">
+    <h1 class="h2">Edit Your Profile</h1>
+    <p class="text-muted">Update your personal information and preferences</p>
+</div>
+
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<div class="row">
+    <div class="col-lg-9">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">Personal Info</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab" aria-controls="skills" aria-selected="false">Skills</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="availability-tab" data-bs-toggle="tab" data-bs-target="#availability" type="button" role="tab" aria-controls="availability" aria-selected="false">Availability</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab" aria-controls="account" aria-selected="false">Account</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-3" id="profileTabsContent">
+                    <!-- Personal Info Tab -->
+                    <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                        <form class="mt-3" method="post">
+                            <input type="hidden" name="form_type" value="personal_info">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" value="{{ user.firstName }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" name="lastName" value="{{ user.lastName }}">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location" name="location" value="{{ user.location }}" placeholder="City, Country">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" name="bio" rows="4" placeholder="Tell others about yourself...">{{ user.bio }}</textarea>
+                                <div class="form-text">Share a bit about yourself, your background, interests, and what you hope to achieve on SkillSwap.</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Skills Tab -->
+                    <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+                        <div class="row g-4 mt-3">
+                            <div class="col-md-6">
+                                <div class="card border">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Skills I Offer</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted">Select skills you can teach to others</p>
+                                        <form method="post">
+                                            <input type="hidden" name="form_type" value="skill_offered">
+                                            <div class="mb-3">
+                                                <select class="form-select" id="skillOffered" name="skillOffered">
+                                                    <option selected disabled>Select a skill...</option>
+                                                    {% for skill in skills %}
+                                                        <option value="{{ skill.id }}">{{ skill.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Add Skill</button>
+                                        </form>
+                                        
+                                        <hr>
+                                        
+                                        <h6>Your offered skills:</h6>
+                                        <div class="skills-list">
+                                            {% if user.skillsOffered is empty %}
+                                                <p class="text-muted">You haven't added any skills yet.</p>
+                                            {% else %}
+                                                {% for skillOffered in user.skillsOffered %}
+                                                    <div class="skill-badge-container">
+                                                        <span class="skill-badge">{{ skillOffered }}</span>
+                                                        <a href="{{ path('app_profile_remove_skill_offered', {'id': skillOffered.id}) }}" class="skill-remove" title="Remove skill">×</a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card border">
+                                    <div class="card-header bg-light">
+                                        <h5 class="card-title mb-0">Skills I Want to Learn</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted">Select skills you want to learn from others</p>
+                                        <form method="post">
+                                            <input type="hidden" name="form_type" value="skill_wanted">
+                                            <div class="mb-3">
+                                                <select class="form-select" id="skillWanted" name="skillWanted">
+                                                    <option selected disabled>Select a skill...</option>
+                                                    {% for skill in skills %}
+                                                        <option value="{{ skill.id }}">{{ skill.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Add Skill</button>
+                                        </form>
+                                        
+                                        <hr>
+                                        
+                                        <h6>Your wanted skills:</h6>
+                                        <div class="skills-list">
+                                            {% if user.skillsWanted is empty %}
+                                                <p class="text-muted">You haven't added any skills yet.</p>
+                                            {% else %}
+                                                {% for skillWanted in user.skillsWanted %}
+                                                    <div class="skill-badge-container">
+                                                        <span class="skill-badge">{{ skillWanted }}</span>
+                                                        <a href="{{ path('app_profile_remove_skill_wanted', {'id': skillWanted.id}) }}" class="skill-remove" title="Remove skill">×</a>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Availability Tab -->
+                    <div class="tab-pane fade" id="availability" role="tabpanel" aria-labelledby="availability-tab">
+                        <form class="mt-3" method="post">
+                            <input type="hidden" name="form_type" value="availability">
+                            <p class="text-muted">Set your weekly availability for skill swap sessions</p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Add availability slot</label>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <select class="form-select" name="day" required>
+                                            <option selected disabled>Select day...</option>
+                                            <option value="1">Monday</option>
+                                            <option value="2">Tuesday</option>
+                                            <option value="3">Wednesday</option>
+                                            <option value="4">Thursday</option>
+                                            <option value="5">Friday</option>
+                                            <option value="6">Saturday</option>
+                                            <option value="7">Sunday</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="time" class="form-control" name="startTime" placeholder="Start time" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="time" class="form-control" name="endTime" placeholder="End time" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <h6>Your current availability:</h6>
+                            <div class="availability-list">
+                                {% if user.availabilities is empty %}
+                                    <p class="text-muted">You haven't set any availability times yet.</p>
+                                {% else %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Day</th>
+                                                    <th>Start Time</th>
+                                                    <th>End Time</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for availability in user.availabilities %}
+                                                    <tr>
+                                                        {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                                        <td>{{ days[availability.dayOfWeek - 1] }}</td>
+                                                        <td>{{ availability.startTime|date('g:i A') }}</td>
+                                                        <td>{{ availability.endTime|date('g:i A') }}</td>
+                                                        <td>
+                                                            <a href="{{ path('app_profile_remove_availability', {'id': availability.id}) }}" class="btn btn-sm btn-outline-danger">Remove</a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Account Tab -->
+                    <div class="tab-pane fade" id="account" role="tabpanel" aria-labelledby="account-tab">
+                        <div class="mt-3">
+                            <h5>Change Password</h5>
+                            <form method="post">
+                                <input type="hidden" name="form_type" value="change_password">
+                                <div class="mb-3">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </form>
+                            
+                            <hr class="my-4">
+                            
+                            <h5 class="text-danger">Delete Account</h5>
+                            <p class="text-muted">Once you delete your account, there is no going back. Please be certain.</p>
+                            <form method="post" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+                                <input type="hidden" name="form_type" value="delete_account">
+                                <button type="submit" class="btn btn-danger">Delete Account</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle me-3" width="50" height="50">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h5 class="card-title mb-0">{{ user.username }}</h5>
+                        <div class="text-muted small">{{ user.email }}</div>
+                    </div>
+                </div>
+                <a href="{{ path('app_profile') }}" class="btn btn-outline-primary w-100">View My Profile</a>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Profile Completion</h5>
+                {% set completionScore = 0 %}
+                {% set completionTotal = 5 %}
+                {% if user.firstName and user.lastName %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.bio %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.skillsOffered is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.skillsWanted is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                {% if user.availabilities is not empty %}{% set completionScore = completionScore + 1 %}{% endif %}
+                
+                {% set completionPercentage = (completionScore / completionTotal) * 100 %}
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" style="width: {{ completionPercentage }}%;" aria-valuenow="{{ completionPercentage }}" aria-valuemin="0" aria-valuemax="100">{{ completionPercentage|round }}%</div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item px-0">
+                        <i class="fas {% if user.firstName and user.lastName %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i> 
+                        Basic info
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fas {% if user.bio %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i> 
+                        Bio
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fas {% if user.skillsOffered is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i> 
+                        Skills offered
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fas {% if user.skillsWanted is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i> 
+                        Skills wanted
+                    </li>
+                    <li class="list-group-item px-0">
+                        <i class="fas {% if user.availabilities is not empty %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %}"></i> 
+                        Availability
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<!-- Include Bootstrap JS directly -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap Tabs directly
+        const tabs = document.querySelectorAll('#profileTabs button');
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                // Remove active class from all tabs and panels
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                    
+                    // Hide the associated tab pane
+                    const paneId = t.getAttribute('data-bs-target');
+                    const pane = document.querySelector(paneId);
+                    if (pane) {
+                        pane.classList.remove('show', 'active');
+                    }
+                });
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+                
+                // Show the associated tab pane
+                const targetId = this.getAttribute('data-bs-target');
+                const targetPane = document.querySelector(targetId);
+                if (targetPane) {
+                    targetPane.classList.add('show', 'active');
+                }
+                
+                // Update URL hash
+                history.pushState(null, null, targetId);
+            });
+        });
+        
+        // Check for hash in URL and activate corresponding tab
+        const hash = window.location.hash;
+        if (hash && ['#personal', '#skills', '#availability', '#account'].includes(hash)) {
+            const activeTab = document.querySelector(`button[data-bs-target="${hash}"]`);
+            if (activeTab) {
+                activeTab.click();
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

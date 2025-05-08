@@ -1,0 +1,398 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if searchTerm %}Search: {{ searchTerm }}{% else %}Explore Skills{% endif %} - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="skills-header">
+    <h1>Explore Skills</h1>
+    <p>Find skills to learn or people to teach what you know</p>
+</div>
+
+<div class="skills-search">
+    <form class="search-form" method="get" action="{{ path('app_skills') }}">
+        <div class="form-group">
+            <div class="input-icon-wrapper">
+                <i class="fas fa-search input-icon"></i>
+                <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search skills or keywords..." value="{{ searchTerm }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <select class="form-select" name="category" id="categorySelect">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selectedCategory and selectedCategory.id == category.id %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-search">Search</button>
+    </form>
+</div>
+
+<!-- Live Search Results Container -->
+<div id="liveSearchResults" class="live-search-results d-none">
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush" id="searchResultsList">
+                <!-- Results will be inserted here dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="skills-wrapper">
+    {% if searchTerm %}
+        <div class="search-results-header">
+            <h2 class="section-title">Search Results for "{{ searchTerm }}"</h2>
+            {% if users is empty %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No users or skills found matching "{{ searchTerm }}".
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if users is not empty %}
+            <div class="row g-4">
+                {% for user in users %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card skill-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar bg-primary text-white me-3 rounded-circle" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                        {% if user.avatar %}
+                                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle" width="50" height="50">
+                                        {% else %}
+                                            {{ user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                        <div class="text-muted small">
+                                            {% if user.location %}
+                                                <i class="fas fa-map-marker-alt"></i> {{ user.location }}
+                                            {% else %}
+                                                Member since {{ user.createdAt|date('M Y') }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if user.skillsOffered is not empty %}
+                                    <h6 class="mb-2">Skills Offered:</h6>
+                                    <div class="mb-3">
+                                        {% for skill in user.skillsOffered|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsOffered|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsOffered|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if user.skillsWanted is not empty %}
+                                    <h6 class="mb-2">Skills Wanted:</h6>
+                                    <div>
+                                        {% for skill in user.skillsWanted|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsWanted|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsWanted|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-outline-primary">View Profile</a>
+                                {% if is_granted('ROLE_USER') and app.user.id != user.id %}
+                                    <a href="#" class="btn btn-outline-success">Request Session</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <h2 class="section-title">Skill Categories</h2>
+        
+        {% if categories is empty %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No skill categories have been created yet.
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for category in categories %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card skill-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="text-gradient me-3 fs-3">
+                                        {% if category.icon %}
+                                            <i class="{{ category.icon }}"></i>
+                                        {% else %}
+                                            <i class="fas fa-bookmark"></i>
+                                        {% endif %}
+                                    </div>
+                                    <h5 class="card-title mb-0">{{ category.name }}</h5>
+                                </div>
+                                
+                                {% if category.description %}
+                                    <p class="card-text mb-3">{{ category.description }}</p>
+                                {% endif %}
+                                
+                                {% if skills is defined and selectedCategory and selectedCategory.id == category.id %}
+                                    <div class="mb-3">
+                                        <h6>Skills in this category:</h6>
+                                        {% for skill in skills|slice(0, 10) %}
+                                            <span class="skill-badge">{{ skill.name }}</span>
+                                        {% endfor %}
+                                        {% if skills|length > 10 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ skills|length - 10 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% elseif category.skills is defined and category.skills is not empty %}
+                                    <div>
+                                        {% for skill in category.skills|slice(0, 5) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if category.skills|length > 5 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ category.skills|length - 5 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted small">No skills listed in this category yet.</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_skills', {'category': category.id}) }}" class="btn btn-outline-primary">View Skills</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% if selectedCategory and users is not empty %}
+            <h2 class="section-title mt-5">People with {{ selectedCategory.name }} Skills</h2>
+            
+            <div class="row g-4">
+                {% for user in users %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card skill-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="avatar bg-primary text-white me-3 rounded-circle" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                        {% if user.avatar %}
+                                            <img src="{{ user.avatar }}" alt="{{ user.username }}" class="rounded-circle" width="50" height="50">
+                                        {% else %}
+                                            {{ user.username|first|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                        <div class="text-muted small">
+                                            {% if user.location %}
+                                                <i class="fas fa-map-marker-alt"></i> {{ user.location }}
+                                            {% else %}
+                                                Member since {{ user.createdAt|date('M Y') }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if user.skillsOffered is not empty %}
+                                    <h6 class="mb-2">Skills Offered:</h6>
+                                    <div class="mb-3">
+                                        {% for skill in user.skillsOffered|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsOffered|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsOffered|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                {% if user.skillsWanted is not empty %}
+                                    <h6 class="mb-2">Skills Wanted:</h6>
+                                    <div>
+                                        {% for skill in user.skillsWanted|slice(0, 3) %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                        {% if user.skillsWanted|length > 3 %}
+                                            <span class="badge bg-secondary me-1 mb-1">+{{ user.skillsWanted|length - 3 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-outline-primary">View Profile</a>
+                                {% if is_granted('ROLE_USER') and app.user.id != user.id %}
+                                    <a href="#" class="btn btn-outline-success">Request Session</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elseif selectedCategory and users is empty %}
+            <div class="alert alert-info mt-4">
+                <i class="fas fa-info-circle me-2"></i>No users found with skills in the {{ selectedCategory.name }} category.
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<style>
+.live-search-results {
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    max-width: 600px;
+    max-height: 400px;
+    overflow-y: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.live-search-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.live-search-item:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.search-item-category {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+</style>
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('#searchInput');
+        const categorySelect = document.querySelector('#categorySelect');
+        const resultsContainer = document.querySelector('#liveSearchResults');
+        const resultsList = document.querySelector('#searchResultsList');
+        
+        if (searchInput && categorySelect && resultsContainer && resultsList) {
+            let searchTimeout;
+            
+            // Function to show live search results
+            function showResults(results) {
+                // Clear previous results
+                resultsList.innerHTML = '';
+                
+                if (results.skills.length === 0 && results.users.length === 0) {
+                    resultsContainer.classList.add('d-none');
+                    return;
+                }
+                
+                // Add skills to results
+                if (results.skills.length > 0) {
+                    const skillsHeading = document.createElement('div');
+                    skillsHeading.className = 'list-group-item bg-light fw-bold';
+                    skillsHeading.textContent = 'Skills';
+                    resultsList.appendChild(skillsHeading);
+                    
+                    results.skills.slice(0, 5).forEach(skill => {
+                        const item = document.createElement('a');
+                        item.className = 'list-group-item list-group-item-action live-search-item';
+                        item.href = `/skills?q=${encodeURIComponent(skill.name)}`;
+                        
+                        let categoryNames = skill.categories.map(c => c.name).join(', ');
+                        
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>${skill.name}</span>
+                                <span class="search-item-category">${categoryNames}</span>
+                            </div>
+                        `;
+                        
+                        resultsList.appendChild(item);
+                    });
+                }
+                
+                // Add users to results
+                if (results.users.length > 0) {
+                    const usersHeading = document.createElement('div');
+                    usersHeading.className = 'list-group-item bg-light fw-bold';
+                    usersHeading.textContent = 'Users';
+                    resultsList.appendChild(usersHeading);
+                    
+                    results.users.slice(0, 5).forEach(user => {
+                        const item = document.createElement('a');
+                        item.className = 'list-group-item list-group-item-action live-search-item';
+                        item.href = user.url;
+                        
+                        const displayName = user.firstName && user.lastName ? 
+                            `${user.firstName} ${user.lastName}` : user.username;
+                        
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>${displayName}</span>
+                                ${user.location ? `<span class="search-item-category">${user.location}</span>` : ''}
+                            </div>
+                        `;
+                        
+                        resultsList.appendChild(item);
+                    });
+                }
+                
+                // Show results container
+                resultsContainer.classList.remove('d-none');
+            }
+            
+            // Attach input event to search input
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    resultsContainer.classList.add('d-none');
+                    return;
+                }
+                
+                searchTimeout = setTimeout(function() {
+                    const category = categorySelect.value;
+                    
+                    // Fetch results from API
+                    fetch(`/api/skills/search?q=${encodeURIComponent(query)}&category=${category}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            showResults(data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching search results:', error);
+                        });
+                }, 300);
+            });
+            
+            // Hide search results when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!searchInput.contains(event.target) && !resultsContainer.contains(event.target)) {
+                    resultsContainer.classList.add('d-none');
+                }
+            });
+            
+            // Show results again when focusing on search input
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    resultsContainer.classList.remove('d-none');
+                }
+            });
+            
+            // Category select change
+            categorySelect.addEventListener('change', function() {
+                if (searchInput.value.trim().length >= 2) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

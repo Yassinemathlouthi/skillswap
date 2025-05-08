@@ -1,0 +1,214 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Session Details - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('app_sessions') }}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="h3 mb-0"><i class="fas fa-calendar-check me-2"></i>Session Details</h1>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="text-muted">Date & Time</h6>
+                                <p class="mb-0 fs-5">{{ session.dateTime|date('F j, Y') }}</p>
+                                <p>{{ session.dateTime|date('g:i a') }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6 class="text-muted">Session Status</h6>
+                                <div>
+                                    {% if session.status == 'pending' %}
+                                        <span class="badge bg-warning p-2">Pending</span>
+                                    {% elseif session.status == 'confirmed' %}
+                                        <span class="badge bg-success p-2">Confirmed</span>
+                                    {% elseif session.status == 'canceled' %}
+                                        <span class="badge bg-danger p-2">Canceled</span>
+                                    {% elseif session.status == 'completed' %}
+                                        <span class="badge bg-secondary p-2">Completed</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h6 class="text-muted">Skill Exchange</h6>
+                                <span class="badge bg-info p-2">{{ session.skill }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="text-muted">Requested By</h6>
+                                <div class="d-flex align-items-center">
+                                    {% if session.fromUser.avatar %}
+                                        <img src="{{ session.fromUser.avatar }}" alt="{{ session.fromUser.username }}" class="rounded-circle me-2" width="36" height="36">
+                                    {% else %}
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                            {{ session.fromUser.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="mb-0">
+                                            {% if session.fromUser.firstName and session.fromUser.lastName %}
+                                                {{ session.fromUser.firstName }} {{ session.fromUser.lastName }}
+                                            {% else %}
+                                                {{ session.fromUser.username }}
+                                            {% endif %}
+                                        </p>
+                                        <small class="text-muted">{{ session.fromUser.username }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h6 class="text-muted">Requested To</h6>
+                                <div class="d-flex align-items-center">
+                                    {% if session.toUser.avatar %}
+                                        <img src="{{ session.toUser.avatar }}" alt="{{ session.toUser.username }}" class="rounded-circle me-2" width="36" height="36">
+                                    {% else %}
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                            {{ session.toUser.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="mb-0">
+                                            {% if session.toUser.firstName and session.toUser.lastName %}
+                                                {{ session.toUser.firstName }} {{ session.toUser.lastName }}
+                                            {% else %}
+                                                {{ session.toUser.username }}
+                                            {% endif %}
+                                        </p>
+                                        <small class="text-muted">{{ session.toUser.username }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Session Notes</h5>
+                </div>
+                <div class="card-body">
+                    {% if session.notes %}
+                        <p>{{ session.notes|nl2br }}</p>
+                    {% else %}
+                        <p class="text-muted">No notes provided for this session.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if session.status == 'pending' and current_user.id == session.toUser.id %}
+                        <div class="d-grid gap-2 mb-3">
+                            <a href="{{ path('app_session_update_status', {'id': session.id, 'status': 'confirmed'}) }}" class="btn btn-success">
+                                <i class="fas fa-check me-1"></i> Confirm Session
+                            </a>
+                            <a href="{{ path('app_session_update_status', {'id': session.id, 'status': 'canceled'}) }}" class="btn btn-danger">
+                                <i class="fas fa-times me-1"></i> Decline Session
+                            </a>
+                        </div>
+                    {% elseif session.status == 'confirmed' %}
+                        <div class="d-grid gap-2 mb-3">
+                            {% if session.dateTime < date() %}
+                                <a href="{{ path('app_session_update_status', {'id': session.id, 'status': 'completed'}) }}" class="btn btn-success">
+                                    <i class="fas fa-check-double me-1"></i> Mark as Completed
+                                </a>
+                            {% endif %}
+                            <a href="{{ path('app_session_cancel', {'id': session.id}) }}" class="btn btn-outline-danger">
+                                <i class="fas fa-ban me-1"></i> Cancel Session
+                            </a>
+                        </div>
+                    {% elseif session.status == 'completed' and not (session.fromUser.id == current_user.id) %}
+                        <div class="d-grid gap-2 mb-3">
+                            <a href="#" class="btn btn-warning">
+                                <i class="fas fa-star me-1"></i> Leave Review
+                            </a>
+                        </div>
+                    {% endif %}
+                    
+                    {% set otherUser = current_user.id == session.fromUser.id ? session.toUser : session.fromUser %}
+                    <div class="d-grid gap-2">
+                        <a href="{{ path('app_message_new', {'username': otherUser.username}) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-comments me-1"></i> Message {{ otherUser.firstName ?? otherUser.username }}
+                        </a>
+                        <a href="{{ path('app_user_profile', {'username': otherUser.username}) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user me-1"></i> View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Session Timeline</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item py-3">
+                            <div class="d-flex">
+                                <div class="timeline-icon bg-primary text-white">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <div class="fw-medium">Session Requested</div>
+                                    <div class="text-muted small">{{ session.createdAt|date('M j, Y g:i a') }}</div>
+                                    <div class="small">by {{ session.fromUser.username }}</div>
+                                </div>
+                            </div>
+                        </li>
+                        
+                        {% if session.status != 'pending' %}
+                            <li class="list-group-item py-3">
+                                <div class="d-flex">
+                                    <div class="timeline-icon {{ session.status == 'confirmed' ? 'bg-success' : (session.status == 'canceled' ? 'bg-danger' : 'bg-secondary') }} text-white">
+                                        <i class="fas {{ session.status == 'confirmed' ? 'fa-check' : (session.status == 'canceled' ? 'fa-times' : 'fa-check-double') }}"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="fw-medium">
+                                            Session {{ session.status == 'confirmed' ? 'Confirmed' : (session.status == 'canceled' ? 'Canceled' : 'Completed') }}
+                                        </div>
+                                        <div class="text-muted small">{{ session.updatedAt|date('M j, Y g:i a') }}</div>
+                                        <div class="small">by {{ session.toUser.username }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+</style>
+{% endblock %} 

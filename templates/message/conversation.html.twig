@@ -1,0 +1,266 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conversation with {{ other_user.username }} - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="d-flex align-items-center">
+                <a href="{{ path('app_messages') }}" class="btn btn-outline-secondary btn-sm me-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        {% if other_user.avatar %}
+                            <img src="{{ other_user.avatar }}" alt="{{ other_user.username }}" class="rounded-circle" width="40" height="40">
+                        {% else %}
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 1rem;">
+                                {{ other_user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h5 class="mb-0">
+                            {% if other_user.firstName and other_user.lastName %}
+                                {{ other_user.firstName }} {{ other_user.lastName }}
+                            {% else %}
+                                {{ other_user.username }}
+                            {% endif %}
+                        </h5>
+                        <div class="text-muted small">
+                            {% if other_user.isOnline is defined and other_user.isOnline %}
+                                <span class="text-success">Online</span>
+                            {% else %}
+                                Last seen {{ other_user.lastActive is defined ? other_user.lastActive|date('M j, g:i a') : 'recently' }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="ms-auto">
+                    <a href="{{ path('app_user_profile', {'username': other_user.username}) }}" class="btn btn-link text-decoration-none">
+                        <i class="fas fa-user me-1"></i> View Profile
+                    </a>
+                    <a href="{{ path('app_session_new', {'username': other_user.username}) }}" class="btn btn-primary ms-2">
+                        <i class="fas fa-calendar-plus me-1"></i> Request Session
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="messages-container" id="messages-container">
+                {% if messages is empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5>No messages yet</h5>
+                        <p class="text-muted">Start the conversation by sending a message below.</p>
+                    </div>
+                {% else %}
+                    <div class="px-3 py-4">
+                        {% set currentDate = null %}
+                        {% for message in messages %}
+                            {% set messageDate = message.timestamp|date('Y-m-d') %}
+                            
+                            {% if currentDate != messageDate %}
+                                <div class="message-date-divider">
+                                    <span>
+                                        {% if messageDate == "now"|date('Y-m-d') %}
+                                            Today
+                                        {% elseif messageDate == "now"|date_modify("-1 day")|date('Y-m-d') %}
+                                            Yesterday
+                                        {% else %}
+                                            {{ message.timestamp|date('F j, Y') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                {% set currentDate = messageDate %}
+                            {% endif %}
+                            
+                            <div class="message-wrapper {{ message.sender.id == app.user.id ? 'outgoing' : 'incoming' }}">
+                                <div class="message-bubble">
+                                    <div class="message-content">{{ message.content }}</div>
+                                    <div class="message-info">
+                                        <span class="message-time">{{ message.timestamp|date('g:i a') }}</span>
+                                        {% if message.sender.id == app.user.id %}
+                                            <span class="message-status">
+                                                {% if message.isRead %}
+                                                    <i class="fas fa-check-double text-primary"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check"></i>
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="message-input-container bg-light p-3 border-top">
+                <form id="message-form" action="{{ path('app_message_send') }}" method="post">
+                    <input type="hidden" name="receiver" value="{{ other_user.username }}">
+                    <div class="input-group">
+                        <textarea name="content" class="form-control" id="message-input" placeholder="Type a message..." rows="1" required></textarea>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.messages-container {
+    height: calc(100vh - 250px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message-wrapper {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.message-wrapper.incoming {
+    justify-content: flex-start;
+}
+
+.message-wrapper.outgoing {
+    justify-content: flex-end;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    position: relative;
+}
+
+.message-wrapper.incoming .message-bubble {
+    background-color: #f1f3f5;
+    border-bottom-left-radius: 4px;
+}
+
+.message-wrapper.outgoing .message-bubble {
+    background-color: #007bff;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.message-wrapper.outgoing .message-info {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+}
+
+.message-content {
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+
+.message-info {
+    display: flex;
+    font-size: 0.75rem;
+    color: #6c757d;
+    justify-content: space-between;
+}
+
+.message-date-divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.message-date-divider:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid #e9ecef;
+    z-index: 0;
+}
+
+.message-date-divider span {
+    background-color: white;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.message-input-container {
+    position: sticky;
+    bottom: 0;
+}
+
+textarea.form-control {
+    resize: none;
+}
+
+/* Dark mode styles */
+.dark-mode .message-wrapper.incoming .message-bubble {
+    background-color: #2d3748;
+}
+.dark-mode .message-date-divider span {
+    background-color: #1a202c;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    
+    // Scroll to bottom of messages container
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Submit form using AJAX
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Clear the input
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                
+                // Reload the page to show the new message
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    
+    // Call scrollToBottom on page load
+    scrollToBottom();
+});
+</script>
+{% endblock %} 

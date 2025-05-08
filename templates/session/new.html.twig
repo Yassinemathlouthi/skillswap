@@ -1,0 +1,335 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Request Session - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('app_user_profile', {'username': other_user.username}) }}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="h3 mb-0"><i class="fas fa-calendar-plus me-2"></i>Request Session</h1>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-sliders-h me-2"></i>Session Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form_widget(form.dateTime) }}
+                                    {{ form_label(form.dateTime) }}
+                                </div>
+                                {{ form_errors(form.dateTime) }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                                    Choose a date and time for your session
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.skill.vars.id }}" class="form-label">{{ form.skill.vars.label }}</label>
+                                {{ form_widget(form.skill, {'attr': {'class': 'form-select form-select-lg'}}) }}
+                                {{ form_errors(form.skill) }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                                    <span class="text-success fw-medium">Green items</span> are great matches between your skills!
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.notes.vars.id }}" class="form-label">{{ form.notes.vars.label }}</label>
+                            {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'style': 'border-radius: 10px;'}}) }}
+                            {{ form_errors(form.notes) }}
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1 text-primary"></i>
+                                Provide any additional information for the session
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <a href="{{ path('app_user_profile', {'username': other_user.username}) }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-paper-plane me-1"></i> Send Request
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            
+            <!-- Session Benefits Card -->
+            <div class="card border-0 shadow-sm rounded-3 mt-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4"><i class="fas fa-lightbulb text-warning me-2"></i>Why Request a Session?</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="icon-circle bg-primary-subtle text-primary">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Connect in Person</h6>
+                                    <p class="text-muted small mb-0">Meet face-to-face to exchange skills and knowledge</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="icon-circle bg-success-subtle text-success">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Learn by Doing</h6>
+                                    <p class="text-muted small mb-0">Practical, hands-on learning experience</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="icon-circle bg-warning-subtle text-warning">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Mutual Exchange</h6>
+                                    <p class="text-muted small mb-0">Both teach and learn valuable skills</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="icon-circle bg-info-subtle text-info">
+                                        <i class="fas fa-medal"></i>
+                                    </div>
+                                </div>
+                                <div class="ms-3">
+                                    <h6 class="mb-1">Build Reputation</h6>
+                                    <p class="text-muted small mb-0">Get reviews and grow your profile</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow border-0 rounded-3 mb-4 user-profile-card">
+                <div class="card-header p-0 border-0">
+                    <div class="user-banner" style="background-color: #4C6EF5;"></div>
+                </div>
+                <div class="card-body pt-0 p-4">
+                    <div class="text-center avatar-container">
+                        {% if other_user.avatar %}
+                            <img src="{{ other_user.avatar }}" alt="{{ other_user.username }}" class="rounded-circle avatar-image">
+                        {% else %}
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center avatar-image">
+                                {{ other_user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="text-center mt-3 mb-3">
+                        <h5 class="card-title fw-bold mb-1">
+                            {% if other_user.firstName and other_user.lastName %}
+                                {{ other_user.firstName }} {{ other_user.lastName }}
+                            {% else %}
+                                {{ other_user.username }}
+                            {% endif %}
+                        </h5>
+                        <p class="text-muted mb-2">{{ other_user.username }}</p>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ other_user.location ?? 'No location specified' }}
+                        </p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mt-3">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-award text-primary me-2"></i>Skills They Offer:
+                        </h6>
+                        <div class="skills-container">
+                            {% if other_user.skillsOffered is empty %}
+                                <p class="text-muted small">No skills listed.</p>
+                            {% else %}
+                                {% for skillOffered in other_user.skillsOffered %}
+                                    <span class="badge bg-primary rounded-pill p-2 px-3 m-1">{{ skillOffered }}</span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-clock text-success me-2"></i>Availability:
+                        </h6>
+                        {% if other_user.availabilities is empty %}
+                            <p class="text-muted small">No availability listed.</p>
+                        {% else %}
+                            <ul class="list-group availability-list">
+                                {% for availability in other_user.availabilities %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center border-0 bg-light rounded-3 mb-2 px-3 py-2">
+                                        <div>
+                                            {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                            <span class="day-badge bg-primary-subtle text-primary me-2">{{ days[availability.dayOfWeek - 1]|slice(0, 3) }}</span>
+                                        </div>
+                                        <div class="small fw-medium">{{ availability.startTime|date('g:i A') }} - {{ availability.endTime|date('g:i A') }}</div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-white p-3 border-top">
+                    <a href="{{ path('app_message_new', {'username': other_user.username}) }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-comments me-1"></i> Message {{ other_user.firstName ?? other_user.username }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styling for the session request page */
+.bg-primary-subtle {
+    background-color: rgba(76, 110, 245, 0.15);
+}
+
+.bg-success-subtle {
+    background-color: rgba(40, 167, 69, 0.15);
+}
+
+.bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.15);
+}
+
+.bg-info-subtle {
+    background-color: rgba(23, 162, 184, 0.15);
+}
+
+.text-primary {
+    color: #4C6EF5 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #4C6EF5, #7C3AED);
+}
+
+.preferred-skill {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.availability-list .list-group-item {
+    transition: all 0.2s ease;
+}
+
+.availability-list .list-group-item:hover {
+    background-color: rgba(76, 110, 245, 0.1) !important;
+}
+
+.user-profile-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.user-banner {
+    height: 80px;
+    width: 100%;
+}
+
+.avatar-container {
+    margin-top: -40px;
+    position: relative;
+    z-index: 1;
+}
+
+.avatar-image {
+    width: 80px;
+    height: 80px;
+    border: 4px solid white;
+    object-fit: cover;
+    font-size: 2rem;
+    margin: 0 auto;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+/* Select input style overrides */
+.form-select-lg {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4C6EF5;
+    box-shadow: 0 0 0 0.2rem rgba(76, 110, 245, 0.25);
+}
+
+.dark-mode .bg-primary-subtle {
+    background-color: rgba(76, 110, 245, 0.25);
+}
+
+.dark-mode .bg-success-subtle {
+    background-color: rgba(40, 167, 69, 0.25);
+}
+
+.dark-mode .bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.25);
+}
+
+.dark-mode .bg-info-subtle {
+    background-color: rgba(23, 162, 184, 0.25);
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="auth-form-container">
+    <div class="auth-header">
+        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+        <p>Join our community to start sharing and learning new skills.</p>
+    </div>
+    
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    
+    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
+        <div class="form-group">
+            {{ form_label(registrationForm.username, 'Username') }}
+            <div class="input-icon-wrapper">
+                <i class="fas fa-user input-icon"></i>
+                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': 'Choose a username'}}) }}
+            </div>
+            <div class="form-text">Choose a unique username that will be visible to other users.</div>
+            {% if form_errors(registrationForm.username) %}
+                <div class="invalid-feedback d-block">
+                    {{ form_errors(registrationForm.username) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(registrationForm.email, 'Email Address') }}
+            <div class="input-icon-wrapper">
+                <i class="fas fa-envelope input-icon"></i>
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+            </div>
+            <div class="form-text">We'll never share your email with anyone else.</div>
+            {% if form_errors(registrationForm.email) %}
+                <div class="invalid-feedback d-block">
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(registrationForm.plainPassword.first, 'Password') }}
+            <div class="input-icon-wrapper">
+                <i class="fas fa-lock input-icon"></i>
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Min 8 chars, 1 uppercase, 1 symbol'}}) }}
+            </div>
+            <div class="password-strength" id="password-strength"></div>
+            <div class="form-text">Use at least 8 characters with a mix of letters, numbers & symbols.</div>
+            {% if form_errors(registrationForm.plainPassword.first) %}
+                <div class="invalid-feedback d-block">
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(registrationForm.plainPassword.second, 'Confirm Password') }}
+            <div class="input-icon-wrapper">
+                <i class="fas fa-lock input-icon"></i>
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Repeat password'}}) }}
+            </div>
+            {% if form_errors(registrationForm.plainPassword.second) %}
+                <div class="invalid-feedback d-block">
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-check">
+            {{ form_widget(registrationForm.agreeTerms) }}
+            <label class="form-check-label" for="{{ registrationForm.agreeTerms.vars.id }}">
+                I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="privacy-link">Privacy Policy</a>
+            </label>
+            {% if form_errors(registrationForm.agreeTerms) %}
+                <div class="invalid-feedback d-block">
+                    {{ form_errors(registrationForm.agreeTerms) }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="auth-actions">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-user-plus me-2"></i>Register
+            </button>
+        </div>
+    {{ form_end(registrationForm) }}
+    
+    <div class="auth-footer">
+        Already have an account? <a href="{{ path('app_login') }}">Sign In</a>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.querySelector('#{{ registrationForm.plainPassword.first.vars.id }}');
+        const strengthIndicator = document.getElementById('password-strength');
+        
+        if (passwordField && strengthIndicator) {
+            passwordField.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Length check
+                if (password.length >= 8) strength += 1;
+                
+                // Contains uppercase
+                if (/[A-Z]/.test(password)) strength += 1;
+                
+                // Contains lowercase
+                if (/[a-z]/.test(password)) strength += 1;
+                
+                // Contains number
+                if (/[0-9]/.test(password)) strength += 1;
+                
+                // Contains special character
+                if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+                
+                // Reset all classes
+                strengthIndicator.className = 'password-strength';
+                
+                // Add appropriate class
+                if (password.length === 0) {
+                    // No class if empty
+                } else if (strength < 2) {
+                    strengthIndicator.classList.add('weak');
+                } else if (strength < 4) {
+                    strengthIndicator.classList.add('medium');
+                } else if (strength < 5) {
+                    strengthIndicator.classList.add('strong');
+                } else {
+                    strengthIndicator.classList.add('very-strong');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

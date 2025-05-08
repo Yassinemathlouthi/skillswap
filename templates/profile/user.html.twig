@@ -1,0 +1,317 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user.username }}'s Profile - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="profile-header card shadow-sm mb-4 p-4">
+    <div class="row align-items-center">
+        <div class="col-md-4 text-center text-md-start">
+            <div class="mb-3 mx-auto">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar }}" alt="{{ user.username }}" class="profile-image rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="profile-image rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 150px; height: 150px; font-size: 3rem; margin: 0 auto;">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="profile-info">
+                <h1 class="display-5 fw-bold">
+                    {% if user.firstName and user.lastName %}
+                        {{ user.firstName }} {{ user.lastName }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </h1>
+                <div class="profile-meta mb-3">
+                    <div class="meta-item mb-2">
+                        <i class="fas fa-user me-2"></i> <span class="fw-medium">{{ user.username }}</span>
+                    </div>
+                    <div class="meta-item mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i> 
+                        <span>{{ user.location ?? 'No location specified' }}</span>
+                    </div>
+                    <div class="meta-item mb-2">
+                        <i class="fas fa-calendar me-2"></i> <span>Member since {{ user.createdAt|date('M Y') }}</span>
+                    </div>
+                    {% if average_rating > 0 %}
+                        <div class="meta-item">
+                            <i class="fas fa-star text-warning me-2"></i> 
+                            <span>{{ average_rating|number_format(1) }} ({{ reviews|length }} reviews)</span>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    {% if is_granted('ROLE_USER') and app.user.id != user.id %}
+                        <a href="{{ path('app_message_new', {'username': user.username}) }}" class="btn btn-primary">
+                            <i class="fas fa-comments me-2"></i>Message
+                        </a>
+                        <a href="{{ path('app_session_new', {'username': user.username}) }}" class="btn btn-success ms-2">
+                            <i class="fas fa-calendar-plus me-2"></i>Request Session
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Bio Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">About {{ user.firstName ?? user.username }}</h5>
+            </div>
+            <div class="card-body">
+                {% if user.bio %}
+                    <p>{{ user.bio }}</p>
+                {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-user-edit text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">This user hasn't added a bio yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Offered Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Skills {{ user.firstName ?? user.username }} Offers</h5>
+            </div>
+            <div class="card-body">
+                {% if user.skillsOffered is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-chalkboard-teacher text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">This user hasn't added any skills they offer yet.</p>
+                    </div>
+                {% else %}
+                    <div class="skills-list">
+                        {% for skillOffered in user.skillsOffered %}
+                            <span class="badge bg-primary rounded-pill p-2 px-3 m-1">{{ skillOffered }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skills Wanted Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Skills {{ user.firstName ?? user.username }} Wants to Learn</h5>
+            </div>
+            <div class="card-body">
+                {% if user.skillsWanted is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-graduation-cap text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">This user hasn't added any skills they want to learn yet.</p>
+                    </div>
+                {% else %}
+                    <div class="skills-list">
+                        {% for skillWanted in user.skillsWanted %}
+                            <span class="badge bg-secondary rounded-pill p-2 px-3 m-1">{{ skillWanted }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Reviews ({{ reviews|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if reviews is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-star text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">This user hasn't received any reviews yet.</p>
+                    </div>
+                {% else %}
+                    {% for review in reviews %}
+                        <div class="review-card mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="me-3">
+                                    {% if review.reviewer.avatar %}
+                                        <img src="{{ review.reviewer.avatar }}" alt="{{ review.reviewer.username }}" class="avatar rounded-circle" width="40" height="40">
+                                    {% else %}
+                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px">
+                                            {{ review.reviewer.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ review.reviewer.username }}</div>
+                                    <div class="text-muted small">{{ review.createdAt|date('M j, Y') }}</div>
+                                </div>
+                                <div class="ms-auto">
+                                    <div class="rating">
+                                        {% for i in 1..5 %}
+                                            <i class="fas fa-star {% if i <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% if not loop.last %}
+                            <hr>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Availability Section -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Availability</h5>
+            </div>
+            <div class="card-body">
+                {% if user.availabilities is empty %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="fas fa-calendar-alt text-muted fa-3x"></i>
+                        </div>
+                        <p class="text-muted">This user hasn't set their availability yet.</p>
+                    </div>
+                {% else %}
+                    <ul class="list-group list-group-flush">
+                        {% for availability in user.availabilities %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                    <strong>{{ days[availability.dayOfWeek - 1] }}</strong>
+                                </div>
+                                <div>{{ availability.startTime|date('g:i A') }} - {{ availability.endTime|date('g:i A') }}</div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Skill Match Section -->
+        {% if is_granted('ROLE_USER') and app.user.id != user.id %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Skill Match</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Skills they can teach you</h6>
+                    <div class="mb-3">
+                        {% set matchFound = false %}
+                        {% for myWanted in app.user.skillsWanted %}
+                            {% for theirOffered in user.skillsOffered %}
+                                {% if myWanted.skill.id == theirOffered.skill.id %}
+                                    {% set matchFound = true %}
+                                    <span class="badge bg-primary rounded-pill p-2 px-3 m-1">{{ theirOffered }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        {% if not matchFound %}
+                            <p class="text-muted small">No matches found between your wanted skills and their offered skills.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <h6>Skills you can teach them</h6>
+                    <div>
+                        {% set matchFound = false %}
+                        {% for myOffered in app.user.skillsOffered %}
+                            {% for theirWanted in user.skillsWanted %}
+                                {% if myOffered.skill.id == theirWanted.skill.id %}
+                                    {% set matchFound = true %}
+                                    <span class="badge bg-secondary rounded-pill p-2 px-3 m-1">{{ myOffered }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        {% if not matchFound %}
+                            <p class="text-muted small">No matches found between your offered skills and their wanted skills.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Stats Section -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="card-title mb-0">Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Sessions Completed</div>
+                    <div class="fw-bold">0</div>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <div>Skills Offered</div>
+                    <div class="fw-bold">{{ user.skillsOffered|length }}</div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>Skills Wanted</div>
+                    <div class="fw-bold">{{ user.skillsWanted|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Additional profile page styling */
+.profile-header {
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    margin-right: 1.5rem;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.progress {
+    height: 0.75rem;
+    border-radius: var(--border-radius);
+}
+
+.review-card {
+    padding: 1rem;
+    border-radius: var(--border-radius-sm);
+    background-color: var(--gray-50);
+    margin-bottom: 1rem;
+}
+
+.dark-mode .review-card {
+    background-color: var(--bg-secondary);
+}
+
+.rating {
+    font-size: 1rem;
+    letter-spacing: 2px;
+}
+</style>
+{% endblock %} 

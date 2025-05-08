@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Welcome to SkillSwap!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        
+        <!-- Animate.css -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+        
+        <!-- Webpack Encore CSS -->
+        {{ encore_entry_link_tags('app') }}
+        
+        {% block stylesheets %}{% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+        
+        <style>
+            /* Inline critical page loader styles to prevent FOUC */
+            .page-loader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #F9FAFB;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                transition: opacity 0.5s ease, visibility 0.5s ease;
+            }
+            
+            .dark-mode .page-loader {
+                background-color: #0F172A;
+            }
+            
+            .loader-spinner {
+                width: 50px;
+                height: 50px;
+                margin: 0 auto 1rem;
+                border: 3px solid rgba(76, 110, 245, 0.3);
+                border-radius: 50%;
+                border-top-color: #4C6EF5;
+                animation: spin 1s infinite ease-in-out;
+                display: inline-block;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            .loader-text {
+                font-size: 1.25rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #4C6EF5, #7C3AED);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+        </style>
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        <!-- Page Loader -->
+        <div class="page-loader" id="page-loader">
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+                <div class="loader-text">SkillSwap</div>
+            </div>
+        </div>
+        
+        {% include 'partials/header.html.twig' %}
+
+        <main class="main-content flex-grow-1">
+            <div class="container">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="footer mt-auto py-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 mb-4 mb-lg-0">
+                        <h5>SkillSwap</h5>
+                        <p>Connect, Learn, Share – Exchange skills with people around you for free.</p>
+                        <div class="social-links mt-3">
+                            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                        <h5>Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="{{ path('app_home') }}">Home</a></li>
+                            <li><a href="{{ path('app_skills') }}">Explore Skills</a></li>
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                        <h5>Legal</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                            <li><a href="#">Accessibility</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <h5>Connect</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">Report an Issue</a></li>
+                            <li><a href="#">Suggest a Feature</a></li>
+                            <li><a href="#">Community Guidelines</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="copyright">
+                    &copy; {% if "now"|date("Y") != "2023" %}2023-{% endif %}{{ "now"|date("Y") }} SkillSwap. All rights reserved.
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Back to top button -->
+        <button id="back-to-top" class="btn btn-primary btn-icon-only back-to-top" aria-label="Back to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <script>
+            // Back to top button
+            document.addEventListener('DOMContentLoaded', function() {
+                var backToTopButton = document.getElementById('back-to-top');
+                
+                if (backToTopButton) {
+                    // Initially hide the button
+                    backToTopButton.style.display = 'none';
+                    
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 300) {
+                            backToTopButton.style.display = 'flex';
+                            
+                            if (window.scrollY > 400) {
+                                backToTopButton.classList.add('show');
+                            }
+                        } else {
+                            backToTopButton.classList.remove('show');
+                            
+                            setTimeout(function() {
+                                if (!backToTopButton.classList.contains('show')) {
+                                    backToTopButton.style.display = 'none';
+                                }
+                            }, 300);
+                        }
+                    });
+                    
+                    backToTopButton.addEventListener('click', function() {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+            });
+            
+            // Ensure page loader disappears
+            window.addEventListener('load', function() {
+                // Hide page loader
+                const pageLoader = document.getElementById('page-loader');
+                if (pageLoader) {
+                    pageLoader.classList.add('fade-out');
+                    setTimeout(function() {
+                        pageLoader.style.display = 'none';
+                    }, 500);
+                }
+                
+                // Add content-loaded class to enable animations
+                document.body.classList.add('content-loaded');
+            });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize page loader
+                const pageLoader = document.getElementById('page-loader');
+                if (pageLoader) {
+                    setTimeout(function() {
+                        pageLoader.classList.add('loaded');
+                        setTimeout(function() {
+                            pageLoader.style.display = 'none';
+                        }, 300);
+                    }, 500);
+                }
+                
+                // Dark mode toggle
+                const darkModeToggle = document.querySelector('.dark-mode-toggle');
+                const htmlElement = document.documentElement;
+                
+                // Check if user has a preference stored
+                const darkMode = localStorage.getItem('darkMode') === 'true';
+                if (darkMode) {
+                    htmlElement.classList.add('dark-mode');
+                    if (darkModeToggle) {
+                        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    }
+                }
+                
+                if (darkModeToggle) {
+                    darkModeToggle.addEventListener('click', function() {
+                        htmlElement.classList.toggle('dark-mode');
+                        const isDarkMode = htmlElement.classList.contains('dark-mode');
+                        localStorage.setItem('darkMode', isDarkMode);
+                        darkModeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                    });
+                }
+                
+                // Message notification checker
+                {% if app.user %}
+                    const messageCountElement = document.querySelector('.message-count');
+                    
+                    function checkMessages() {
+                        fetch('{{ path("app_message_notifications") }}')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.count > 0) {
+                                    messageCountElement.textContent = data.count > 9 ? '9+' : data.count;
+                                    messageCountElement.classList.remove('d-none');
+                                } else {
+                                    messageCountElement.classList.add('d-none');
+                                }
+                            })
+                            .catch(error => console.error('Error checking messages:', error));
+                    }
+                    
+                    // Check messages on page load and then every minute
+                    checkMessages();
+                    setInterval(checkMessages, 60000);
+                {% endif %}
+            });
+        </script>
+    </body>
+</html>
