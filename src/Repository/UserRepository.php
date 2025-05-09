@@ -191,28 +191,63 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         
         $conn = $this->getEntityManager()->getConnection();
         
+        // Create placeholders for the IN clause
+        $placeholders = implode(',', array_fill(0, count($skillIds), '?'));
+        
         $sql = '
             SELECT DISTINCT u.*,
-                (6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * cos(radians(u.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(u.latitude)))) AS distance
+                (6371 * acos(cos(radians(?)) * cos(radians(u.latitude)) * cos(radians(u.longitude) - radians(?)) + sin(radians(?)) * sin(radians(u.latitude)))) AS distance
             FROM `user` u
             LEFT JOIN user_skill_offered so ON u.id = so.user_id
             LEFT JOIN user_skill_wanted sw ON u.id = sw.user_id
-            WHERE (so.skill_id IN (:skillIds) OR sw.skill_id IN (:skillIds))
+            WHERE (so.skill_id IN (' . $placeholders . ') OR sw.skill_id IN (' . $placeholders . '))
             AND u.latitude IS NOT NULL
             AND u.longitude IS NOT NULL
-            HAVING distance < :radius
+            HAVING distance < ?
             ORDER BY distance ASC
-            LIMIT :limit
+            LIMIT ?
         ';
         
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue('latitude', $latitude);
-        $stmt->bindValue('longitude', $longitude);
-        $stmt->bindValue('radius', $radiusInKm);
-        $stmt->bindValue('skillIds', $skillIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-        $stmt->bindValue('limit', $limit, \PDO::PARAM_INT);
+        // Create parameters array with positional placeholders
+        $params = [$latitude, $longitude, $latitude];
         
-        $resultSet = $stmt->executeQuery()->fetchAllAssociative();
+        // Add skill IDs for the first IN clause
+        foreach ($skillIds as $id) {
+            $params[] = $id;
+        }
+        
+        // Add skill IDs for the second IN clause
+        foreach ($skillIds as $id) {
+            $params[] = $id;
+        }
+        
+        // Add radius and limit
+        $params[] = $radiusInKm;
+        $params[] = $limit;
+        
+        // Define types array
+        $types = [
+            \PDO::PARAM_STR, // latitude
+            \PDO::PARAM_STR, // longitude
+            \PDO::PARAM_STR, // latitude again
+        ];
+        
+        // Add types for skill IDs (first IN clause)
+        for ($i = 0; $i < count($skillIds); $i++) {
+            $types[] = \PDO::PARAM_INT;
+        }
+        
+        // Add types for skill IDs (second IN clause)
+        for ($i = 0; $i < count($skillIds); $i++) {
+            $types[] = \PDO::PARAM_INT;
+        }
+        
+        // Add types for radius and limit
+        $types[] = \PDO::PARAM_STR; // radius
+        $types[] = \PDO::PARAM_INT; // limit
+        
+        $stmt = $conn->executeQuery($sql, $params, $types);
+        $resultSet = $stmt->fetchAllAssociative();
         
         $result = [];
         foreach ($resultSet as $row) {

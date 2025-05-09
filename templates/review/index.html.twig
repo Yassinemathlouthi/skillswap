@@ -1,0 +1,254 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reviews - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="h3 mb-0"><i class="fas fa-star me-2"></i>Reviews</h1>
+    </div>
+    
+    <ul class="nav nav-tabs mb-4" id="reviewsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab" aria-controls="received" aria-selected="true">
+                <i class="fas fa-trophy me-1"></i> Reviews Received
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="written-tab" data-bs-toggle="tab" data-bs-target="#written" type="button" role="tab" aria-controls="written" aria-selected="false">
+                <i class="fas fa-pen me-1"></i> Reviews Written
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="reviewsTabContent">
+        <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+            <div class="row">
+                <div class="col-lg-8">
+                    {% if received_reviews is empty %}
+                        <div class="card shadow-sm">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-star-half-alt text-warning fa-4x"></i>
+                                </div>
+                                <h3>No Reviews Yet</h3>
+                                <p class="text-muted">You haven't received any reviews yet. Complete sessions with other users to get reviews.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Reviews From Others</h5>
+                                <span class="badge bg-primary rounded-pill">{{ received_reviews|length }}</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    {% for review in received_reviews %}
+                                        <li class="list-group-item py-4">
+                                            <div class="d-flex">
+                                                <div class="me-3">
+                                                    {% set reviewer = review.reviewer %}
+                                                    {% if reviewer and reviewer.avatar %}
+                                                        <img src="{{ reviewer.avatar }}" alt="{{ reviewer.username }}" class="rounded-circle" width="48" height="48">
+                                                    {% else %}
+                                                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                                            {{ reviewer ? reviewer.username|first|upper : '?' }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <div>
+                                                            <h6 class="mb-0">{{ reviewer ? reviewer.username : 'Unknown User' }}</h6>
+                                                            <div class="text-warning">
+                                                                {% for i in 1..5 %}
+                                                                    <i class="{% if i <= review.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted">{{ review.createdAt|date('M j, Y') }}</small>
+                                                    </div>
+                                                    <p class="mb-1">{{ review.comment }}</p>
+                                                    {% set session = review.session %}
+                                                    {% if session %}
+                                                        <div class="mt-2">
+                                                            <span class="badge bg-info">{{ session.skill }}</span>
+                                                            <small class="text-muted ms-2">Session on {{ session.dateTime|date('M j, Y') }}</small>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">Your Rating</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if received_reviews is empty %}
+                                <div class="display-4 mb-3">-</div>
+                                <div class="text-warning mb-2">
+                                    {% for i in 1..5 %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                                <p class="text-muted mb-0">No ratings yet</p>
+                            {% else %}
+                                {% set total_rating = 0 %}
+                                {% for review in received_reviews %}
+                                    {% set total_rating = total_rating + review.rating %}
+                                {% endfor %}
+                                {% set avg_rating = (total_rating / received_reviews|length)|round(1) %}
+                                
+                                <div class="display-4 mb-3">{{ avg_rating }}</div>
+                                <div class="text-warning mb-2">
+                                    {% for i in 1..5 %}
+                                        {% if i <= avg_rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% elseif i - 0.5 <= avg_rating %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="text-muted mb-0">Based on {{ received_reviews|length }} reviews</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">Rating Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if received_reviews is empty %}
+                                <p class="text-muted text-center">No ratings to display</p>
+                            {% else %}
+                                {% set rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0} %}
+                                {% for review in received_reviews %}
+                                    {% set rating_counts = rating_counts|merge({(review.rating): rating_counts[review.rating] + 1}) %}
+                                {% endfor %}
+                                
+                                {% for i in 5..1 %}
+                                    {% set percent = (rating_counts[i] / received_reviews|length * 100)|round %}
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-2 text-warning" style="width: 60px;">
+                                            {% for j in 1..i %}
+                                                <i class="fas fa-star"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ percent }}%" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="ms-2 text-muted small" style="width: 35px;">
+                                            {{ rating_counts[i] }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="written" role="tabpanel" aria-labelledby="written-tab">
+            {% if written_reviews is empty %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-pen-fancy text-primary fa-4x"></i>
+                        </div>
+                        <h3>No Reviews Written</h3>
+                        <p class="text-muted">You haven't written any reviews yet. After completing a session, leave a review for your peer.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Your Written Reviews</h5>
+                                <span class="badge bg-primary rounded-pill">{{ written_reviews|length }}</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="bg-light">
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Rating</th>
+                                                <th>Comment</th>
+                                                <th>Session Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for review in written_reviews %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            {% set reviewed = review.reviewedUser %}
+                                                            {% if reviewed and reviewed.avatar %}
+                                                                <img src="{{ reviewed.avatar }}" alt="{{ reviewed.username }}" class="rounded-circle me-2" width="40" height="40">
+                                                            {% else %}
+                                                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 1rem;">
+                                                                    {{ reviewed ? reviewed.username|first|upper : '?' }}
+                                                                </div>
+                                                            {% endif %}
+                                                            <div>{{ reviewed ? reviewed.username : 'Unknown User' }}</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-warning">
+                                                            {% for i in 1..5 %}
+                                                                <i class="{% if i <= review.rating %}fas{% else %}far{% endif %} fa-star"></i>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-truncate" style="max-width: 300px;">{{ review.comment }}</div>
+                                                    </td>
+                                                    <td>
+                                                        {% set session = review.session %}
+                                                        {% if session %}
+                                                            {{ session.dateTime|date('M j, Y') }}
+                                                        {% else %}
+                                                            <span class="text-muted">Unknown</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <a href="{{ path('app_review_show', {'id': review.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <form method="post" action="{{ path('app_review_delete', {'id': review.id}) }}" onsubmit="return confirm('Are you sure you want to delete this review?');" class="d-inline">
+                                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ review.id) }}">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

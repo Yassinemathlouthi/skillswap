@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Document\Review;
+use App\Entity\Review;
 use App\Repository\ReviewRepository;
 use App\Repository\SessionRepository;
 use App\Repository\UserRepository;
@@ -23,10 +23,10 @@ class ReviewController extends AbstractController
         $currentUser = $this->getUser();
         
         // Get reviews written by the current user
-        $writtenReviews = $reviewRepository->findByReviewer($currentUser->getId());
+        $writtenReviews = $reviewRepository->findByReviewer($currentUser);
         
         // Get reviews about the current user
-        $receivedReviews = $reviewRepository->findByReviewedUser($currentUser->getId());
+        $receivedReviews = $reviewRepository->findByReviewedUser($currentUser);
         
         return $this->render('review/index.html.twig', [
             'written_reviews' => $writtenReviews,
@@ -54,30 +54,22 @@ class ReviewController extends AbstractController
         }
         
         // Check if the current user is part of this session
-        if ($session->getFromUserId() !== $currentUser->getId() && $session->getToUserId() !== $currentUser->getId()) {
+        if ($session->getFromUser()->getId() !== $currentUser->getId() && $session->getToUser()->getId() !== $currentUser->getId()) {
             throw $this->createAccessDeniedException('You do not have access to this session');
         }
         
         // Determine who the current user is reviewing
-        $reviewedUserId = ($session->getFromUserId() === $currentUser->getId()) 
-            ? $session->getToUserId() 
-            : $session->getFromUserId();
-        
-        $reviewedUser = $userRepository->find($reviewedUserId);
-        
-        if (!$reviewedUser) {
-            throw $this->createNotFoundException('User not found');
-        }
+        $reviewedUser = ($session->getFromUser()->getId() === $currentUser->getId()) 
+            ? $session->getToUser() 
+            : $session->getFromUser();
         
         // Check if the user has already submitted a review for this session
-        $existingReview = $reviewRepository->findBySession($sessionId);
-        if ($existingReview && $existingReview->getReviewerId() === $currentUser->getId()) {
+        $existingReviews = $reviewRepository->findBy(['session' => $session, 'reviewer' => $currentUser]);
+        
+        if (!empty($existingReviews)) {
             $this->addFlash('info', 'You have already reviewed this session.');
             return $this->redirectToRoute('app_reviews');
         }
-        
-        // Here we would normally process a form submission
-        // For now, we'll create a review with default values
         
         if ($request->isMethod('POST')) {
             $rating = (int) $request->request->get('rating');
@@ -91,13 +83,13 @@ class ReviewController extends AbstractController
             
             // Create and save the review
             $review = new Review();
-            $review->setReviewerId($currentUser->getId());
-            $review->setReviewedUserId($reviewedUserId);
-            $review->setSessionId($sessionId);
+            $review->setReviewer($currentUser);
+            $review->setReviewedUser($reviewedUser);
+            $review->setSession($session);
             $review->setRating($rating);
             $review->setComment($comment);
             
-            $reviewRepository->save($review);
+            $reviewRepository->save($review, true);
             
             $this->addFlash('success', 'Your review has been submitted successfully!');
             return $this->redirectToRoute('app_reviews');
@@ -110,41 +102,28 @@ class ReviewController extends AbstractController
     }
     
     #[Route('/{id}', name: 'app_review_show')]
-    public function show(string $id, ReviewRepository $reviewRepository, UserRepository $userRepository): Response
+    public function show(Review $review, ReviewRepository $reviewRepository): Response
     {
-        $review = $reviewRepository->find($id);
-        
-        if (!$review) {
-            throw $this->createNotFoundException('Review not found');
-        }
-        
-        // Get user objects for the reviewer and reviewed user
-        $reviewer = $userRepository->find($review->getReviewerId());
-        $reviewedUser = $userRepository->find($review->getReviewedUserId());
+        // Using ParamConverter to automatically fetch the review
         
         return $this->render('review/show.html.twig', [
             'review' => $review,
-            'reviewer' => $reviewer,
-            'reviewed_user' => $reviewedUser,
+            'reviewer' => $review->getReviewer(),
+            'reviewed_user' => $review->getReviewedUser(),
+            'session' => $review->getSession(),
         ]);
     }
     
     #[Route('/{id}/delete', name: 'app_review_delete', methods: ['POST'])]
-    public function delete(string $id, Request $request, ReviewRepository $reviewRepository): Response
+    public function delete(Review $review, Request $request, ReviewRepository $reviewRepository): Response
     {
         // Ensure user is admin or the author of the review
         $this->denyAccessUnlessGranted('ROLE_USER');
         
-        $review = $reviewRepository->find($id);
-        
-        if (!$review) {
-            throw $this->createNotFoundException('Review not found');
-        }
-        
         $currentUser = $this->getUser();
         
         // Check if the current user is the author of the review or an admin
-        if ($review->getReviewerId() !== $currentUser->getId() && !$this->isGranted('ROLE_ADMIN')) {
+        if ($review->getReviewer() !== $currentUser && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('You do not have permission to delete this review');
         }
         
@@ -154,7 +133,7 @@ class ReviewController extends AbstractController
         }
         
         // Delete the review
-        $reviewRepository->remove($review);
+        $reviewRepository->remove($review, true);
         
         $this->addFlash('success', 'Review deleted successfully.');
         

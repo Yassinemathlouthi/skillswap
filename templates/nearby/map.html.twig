@@ -5,10 +5,35 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
+    <style>
+        /* Add custom styles to fix footer overlap issue */
+        .map-container {
+            margin-bottom: 120px; /* Extra space at bottom to avoid footer overlap */
+        }
+        
+        #map {
+            height: 600px;
+        }
+        
+        .user-list {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 992px) {
+            .map-container {
+                margin-bottom: 200px; /* More space on mobile */
+            }
+            
+            .user-list {
+                max-height: 300px;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5">
+<div class="container-fluid py-5 map-container">
     <div class="d-flex align-items-center justify-content-between mb-4">
         <h1 class="h3"><i class="fas fa-map text-primary me-2"></i>Nearby Users Map</h1>
         <div>
@@ -30,7 +55,7 @@
                             <label for="radius" class="form-label">Distance (km)</label>
                             <div class="d-flex align-items-center">
                                 <input type="range" class="form-range flex-grow-1 me-2" id="radius" name="radius" min="5" max="500" step="5" value="{{ radius }}" oninput="this.nextElementSibling.value = this.value">
-                                <output>{{ radius }}</output>
+                                <o>{{ radius }}</o>
                             </div>
                         </div>
 
@@ -68,7 +93,7 @@
                             <p class="text-muted mb-0">No users found within {{ radius }} km.</p>
                         </div>
                     {% else %}
-                        <div class="list-group list-group-flush user-list" style="max-height: 500px; overflow-y: auto;">
+                        <div class="list-group list-group-flush user-list">
                             {% for userWithDistance in users %}
                                 {% set user = userWithDistance[0] %}
                                 {% set distance = userWithDistance.distance|round(1) %}
@@ -111,7 +136,7 @@
         <div class="col-lg-9">
             <div class="card shadow-sm">
                 <div class="card-body p-0">
-                    <div id="map" style="height: 700px;"></div>
+                    <div id="map"></div>
                 </div>
             </div>
         </div>
@@ -184,7 +209,7 @@
                         {% endfor %}
                     </div>
                     <div class="text-center mt-2">
-                        <a href="{{ path('app_profile_view', {'username': user.username}) }}" class="btn btn-sm btn-primary w-100">View Profile</a>
+                        <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-sm btn-primary w-100">View Profile</a>
                     </div>
                 `);
                 

@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\UserMatchingService;
 
 class HomeController extends AbstractController
 {
@@ -33,13 +34,20 @@ class HomeController extends AbstractController
     }
 
     #[Route('/dashboard', name: 'app_dashboard')]
-    public function dashboard(): Response
+    public function dashboard(UserMatchingService $matchingService): Response
     {
         // Ensure user is logged in
         $this->denyAccessUnlessGranted('ROLE_USER');
+        $user = $this->getUser();
+        
+        // Get top matches for recommendations
+        $perfectMatches = $matchingService->findPerfectMatches($user, 3);
+        $potentialTeachers = $matchingService->findTeachersForUser($user, 3);
         
         return $this->render('home/dashboard.html.twig', [
-            'user' => $this->getUser(),
+            'user' => $user,
+            'perfectMatches' => $perfectMatches,
+            'potentialTeachers' => $potentialTeachers,
         ]);
     }
 

@@ -1,0 +1,58 @@
+/* Fix for footer overlap issues */
+
+/* Ensure minimum page height and proper content positioning */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1 0 auto;
+    padding-bottom: 120px; /* Add extra padding at the bottom to ensure content isn't hidden by footer */
+}
+
+/* For mobile devices, add even more padding */
+@media (max-width: 768px) {
+    .main-content {
+        padding-bottom: 180px;
+    }
+}
+
+/* Fix for pages with tables or large content */
+.container-fluid {
+    margin-bottom: 40px;
+}
+
+/* Fix for pages with variable height content */
+.card {
+    margin-bottom: 30px;
+}
+
+/* Ensure footer stays at the bottom without floating in the middle of short pages */
+.footer {
+    flex-shrink: 0;
+    position: relative;
+    width: 100%;
+    z-index: 10;
+}
+
+/* Fix for fixed floating buttons to not be hidden by footer */
+.dashboard-btn,
+.back-to-top {
+    z-index: 20;
+}
+
+/* Add space for pages with tables */
+.table-responsive {
+    margin-bottom: 20px;
+}
+
+/* Add space for long forms */
+form {
+    margin-bottom: 20px;
+} 

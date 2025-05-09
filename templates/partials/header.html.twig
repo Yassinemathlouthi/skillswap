@@ -17,9 +17,6 @@
                         <a class="nav-link {{ app.request.get('_route') == 'app_skills' ? 'active' : '' }}" href="{{ path('app_skills') }}">Explore Skills</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if app.request.get('_route') starts with 'app_messages' %}active{% endif %}" href="{{ path('app_messages') }}">Messages</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {% if app.request.get('_route') starts with 'app_sessions' %}active{% endif %}" href="{{ path('app_sessions') }}">Sessions</a>
                     </li>
                     <li class="nav-item">
@@ -27,6 +24,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.get('_route') starts with 'app_nearby' %}active{% endif %}" href="{{ path('app_nearby') }}">Nearby</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_matching' %}active{% endif %}" href="{{ path('app_matching') }}">
+                            <i class="fas fa-users me-1"></i>Find Matches
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if app.request.get('_route') starts with 'app_help' %}active{% endif %}" href="{{ path('app_help') }}">Help Center</a>

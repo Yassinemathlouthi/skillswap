@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Find Potential Teachers - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="matching-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 mb-0">Find Potential Teachers</h1>
+            <p class="text-muted">Users who can teach you skills you want to learn</p>
+        </div>
+        <div>
+            <a href="{{ path('app_matching') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Matches
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if app.user.skillsWanted is empty %}
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle me-2"></i>Add skills you want to learn</h5>
+        <p class="mb-0">To find potential teachers, you need to add skills you want to learn to your profile.</p>
+        <div class="mt-3">
+            <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Edit My Skills
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+{% if potentialTeachers is empty %}
+    <div class="alert alert-light text-center py-5">
+        <div class="text-muted mb-3">
+            <i class="fas fa-chalkboard-teacher fa-4x"></i>
+        </div>
+        <h4>No potential teachers found</h4>
+        <p class="text-muted">We couldn't find any users who can teach the skills you want to learn.</p>
+        <div class="mt-4">
+            <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Update My Skills
+            </a>
+            <a href="{{ path('app_skills') }}" class="btn btn-outline-primary ms-2">
+                <i class="fas fa-search me-2"></i>Explore Skills
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-lightbulb me-2"></i>Skills You're Learning</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">These are the skills you've added to your profile as skills you want to learn.</p>
+                    <div class="skills-list">
+                        {% for skillWanted in app.user.skillsWanted %}
+                            <span class="badge bg-light text-dark me-1 mb-1">{{ skillWanted }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>Edit Skills
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-graduation-cap me-2"></i>Potential Teachers ({{ potentialTeachers|length }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for match in potentialTeachers %}
+                            <div class="list-group-item p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center">
+                                        <div class="avatar bg-primary text-white mx-auto rounded-circle" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                            {% if match.user.avatar %}
+                                                <img src="{{ match.user.avatar }}" alt="{{ match.user.username }}" class="rounded-circle" width="60" height="60">
+                                            {% else %}
+                                                {{ match.user.username|first|upper }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5 class="mb-0">{{ match.user.username }}</h5>
+                                        <p class="text-muted small mb-0">
+                                            {% if match.user.location %}
+                                                <i class="fas fa-map-marker-alt me-1"></i> {{ match.user.location }}
+                                            {% endif %}
+                                        </p>
+                                        <div class="match-stats mt-1">
+                                            <span class="badge bg-info rounded-pill">{{ match.matchCount }} Skills Match</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="small mb-2">Can teach you:</h6>
+                                        <div>
+                                            {% for skill in match.matchingSkills %}
+                                                <span class="badge bg-light text-dark me-1 mb-1">{{ skill.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <div class="d-grid gap-2">
+                                            <a href="{{ path('app_user_profile', {'username': match.user.username}) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>Profile
+                                            </a>
+                                            <a href="{{ path('app_session_new', {'username': match.user.username}) }}" class="btn btn-sm btn-info text-white">
+                                                <i class="fas fa-comment me-1"></i>Contact
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div class="text-center mb-5">
+    <a href="{{ path('app_matching') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i>Back to All Matches
+    </a>
+</div>
+{% endblock %} 
