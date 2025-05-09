@@ -1,4 +1,5 @@
-<header>
+<!-- Enhanced header with modern design -->
+<header class="header">
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ path('app_home') }}">
@@ -15,6 +16,21 @@
                     <li class="nav-item">
                         <a class="nav-link {{ app.request.get('_route') == 'app_skills' ? 'active' : '' }}" href="{{ path('app_skills') }}">Explore Skills</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_messages' %}active{% endif %}" href="{{ path('app_messages') }}">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_sessions' %}active{% endif %}" href="{{ path('app_sessions') }}">Sessions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_calendar' %}active{% endif %}" href="{{ path('app_calendar') }}">Calendar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_nearby' %}active{% endif %}" href="{{ path('app_nearby') }}">Nearby</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if app.request.get('_route') starts with 'app_help' %}active{% endif %}" href="{{ path('app_help') }}">Help Center</a>
+                    </li>
                     {% if app.user %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -28,6 +44,18 @@
                                 <li><a class="dropdown-item" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                             </ul>
                         </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-shield-alt"></i> Admin
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item" href="{{ path('app_admin') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_admin_users') }}"><i class="fas fa-users"></i> Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_admin_faq') }}"><i class="fas fa-question-circle"></i> FAQs</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 <div class="d-flex align-items-center">
@@ -57,4 +85,50 @@
             </div>
         </div>
     </nav>
-</header> 
+</header>
+
+<style>
+    /* Custom avatar placeholder */
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+    }
+    
+    /* Enhanced message badge */
+    .message-count {
+        top: 5px;
+        right: 5px;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.45rem;
+    }
+    
+    /* Enhanced navbar */
+    .navbar {
+        padding: 0.75rem 0;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+    
+    @media (max-width: 991px) {
+        .navbar-collapse {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow-lg);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    }
+</style> 

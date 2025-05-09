@@ -103,7 +103,7 @@
                             <div class="card-footer">
                                 <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-outline-primary">View Profile</a>
                                 {% if is_granted('ROLE_USER') and app.user.id != user.id %}
-                                    <a href="#" class="btn btn-outline-success">Request Session</a>
+                                    <a href="{{ path('app_session_new', {'username': user.username}) }}" class="btn btn-outline-success">Request Session</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -226,7 +226,7 @@
                             <div class="card-footer">
                                 <a href="{{ path('app_user_profile', {'username': user.username}) }}" class="btn btn-outline-primary">View Profile</a>
                                 {% if is_granted('ROLE_USER') and app.user.id != user.id %}
-                                    <a href="#" class="btn btn-outline-success">Request Session</a>
+                                    <a href="{{ path('app_session_new', {'username': user.username}) }}" class="btn btn-outline-success">Request Session</a>
                                 {% endif %}
                             </div>
                         </div>

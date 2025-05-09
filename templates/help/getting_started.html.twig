@@ -1,0 +1,304 @@
+{% extends 'help/help_base.html.twig' %}
+
+{% block help_content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h1 class="h3 mb-0"><i class="fas fa-rocket text-primary me-2"></i>Getting Started with SkillSwap</h1>
+    </div>
+    <div class="card-body p-4">
+        <p class="lead">Welcome to SkillSwap! This guide will help you set up your profile and start exchanging skills with people in your community.</p>
+        
+        <div class="getting-started-timeline">
+            <!-- Step 1: Create Your Account -->
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span>1</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h5 mb-3">Create Your Account</h3>
+                            <p>Sign up for a SkillSwap account to get started. You'll need to provide basic information like your email address and create a secure password.</p>
+                            
+                            <div class="alert alert-info d-flex">
+                                <i class="fas fa-info-circle fa-lg mt-1 me-3"></i>
+                                <div>Your email is only used for logging in and important notifications. It's never shared with other users.</div>
+                            </div>
+                            
+                            <div class="text-center my-4">
+                                <a href="{{ path('app_register') }}" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Create an Account
+                                </a>
+                                <p class="text-muted mt-2 small">Already have an account? <a href="{{ path('app_login') }}">Sign in</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Complete Your Profile -->
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span>2</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h5 mb-3">Complete Your Profile</h3>
+                            <p>Take time to fill out your profile completely. This helps others understand who you are and what skills you can offer.</p>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Add a profile photo</h6>
+                                            <p class="text-muted small mb-0">A clear photo helps build trust with potential skill exchange partners.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Write a bio</h6>
+                                            <p class="text-muted small mb-0">Share a bit about yourself, your background, and your interests.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Add your location</h6>
+                                            <p class="text-muted small mb-0">This helps match you with people nearby for in-person skill exchanges.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Set your availability</h6>
+                                            <p class="text-muted small mb-0">Let others know when you're usually available for skill exchanges.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center my-4">
+                                <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                                    <i class="fas fa-user-edit me-2"></i>Edit Your Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Add Your Skills -->
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span>3</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h5 mb-3">Add Your Skills</h3>
+                            <p>The heart of SkillSwap is sharing what you know and learning what you don't. Add the skills you can offer to others and the skills you want to learn.</p>
+                            
+                            <div class="row g-4 mt-3">
+                                <div class="col-md-6">
+                                    <div class="card h-100 bg-light border-0">
+                                        <div class="card-body">
+                                            <h6><i class="fas fa-share-alt text-primary me-2"></i>Skills You Offer</h6>
+                                            <p class="small">These are skills you're confident in and willing to teach others. Be specific about your level of expertise and any specializations.</p>
+                                            <div class="mt-3">
+                                                <span class="badge bg-primary me-1 mb-1">Cooking</span>
+                                                <span class="badge bg-primary me-1 mb-1">Photography</span>
+                                                <span class="badge bg-primary me-1 mb-1">Guitar</span>
+                                                <span class="badge bg-primary me-1 mb-1">Web Design</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card h-100 bg-light border-0">
+                                        <div class="card-body">
+                                            <h6><i class="fas fa-lightbulb text-success me-2"></i>Skills You Want to Learn</h6>
+                                            <p class="small">These are skills you're interested in learning. You can specify your current level and what aspects you're most curious about.</p>
+                                            <div class="mt-3">
+                                                <span class="badge bg-secondary me-1 mb-1">Spanish</span>
+                                                <span class="badge bg-secondary me-1 mb-1">Woodworking</span>
+                                                <span class="badge bg-secondary me-1 mb-1">Gardening</span>
+                                                <span class="badge bg-secondary me-1 mb-1">Painting</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center my-4">
+                                <a href="{{ path('app_profile_edit', {'_fragment': 'skills'}) }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Add Your Skills
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Find Skill Matches -->
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span>4</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h5 mb-3">Find Skill Matches</h3>
+                            <p>Start exploring the community to find people who offer skills you want to learn, or who want to learn skills you can offer.</p>
+                            
+                            <div class="row g-4 mt-3">
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Browse Skills Directory</h6>
+                                            <p class="text-muted small mb-0">Explore all available skills or search by categories.</p>
+                                            <a href="{{ path('app_skills') }}" class="btn btn-sm btn-outline-primary mt-2">Browse Skills</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0 text-primary me-3">
+                                            <i class="fas fa-user-friends"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">View Suggested Matches</h6>
+                                            <p class="text-muted small mb-0">We'll suggest users who have matching skill offers and wants.</p>
+                                            <a href="{{ path('app_home') }}" class="btn btn-sm btn-outline-primary mt-2">View Suggestions</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 5: Request a Session -->
+            <div class="timeline-item">
+                <div class="timeline-marker">
+                    <span>5</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="h5 mb-3">Request a Session</h3>
+                            <p>When you find someone with a skill you want to learn, you can request a session with them. Be clear about what you're hoping to learn and suggest potential times based on their availability.</p>
+                            
+                            <div class="alert alert-success d-flex">
+                                <i class="fas fa-lightbulb fa-lg mt-1 me-3"></i>
+                                <div>Consider offering one of your skills in exchange for their time, creating a mutual learning opportunity!</div>
+                            </div>
+                            
+                            <div class="mt-4 text-center">
+                                <a href="{{ path('app_skills') }}" class="btn btn-primary">
+                                    <i class="fas fa-calendar-plus me-2"></i>Find Someone to Exchange Skills With
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-5 text-center">
+            <h5>Ready to get started?</h5>
+            <div class="d-flex justify-content-center gap-3 mt-3">
+                <a href="{{ path('app_register') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </a>
+                <a href="{{ path('app_skills') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-2"></i>Explore Skills
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.getting-started-timeline {
+    position: relative;
+    margin: 2rem 0;
+}
+
+.getting-started-timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 28px;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    border-radius: 4px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 3rem;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.timeline-marker span {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 10px rgba(76, 110, 245, 0.3);
+}
+
+.timeline-content {
+    padding-bottom: 1.5rem;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ action == 'new' ? 'Add New FAQ' : 'Edit FAQ' }} - Admin - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('app_admin_faq') }}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="h3 mb-0"><i class="fas fa-question-circle me-2"></i>{{ action == 'new' ? 'Add New FAQ' : 'Edit FAQ' }}</h1>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">FAQ Details</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        <div class="mb-4">
+                            {{ form_label(form.question) }}
+                            {{ form_widget(form.question) }}
+                            {{ form_errors(form.question) }}
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1 text-primary"></i>
+                                Make questions clear and specific
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form_label(form.answer) }}
+                            {{ form_widget(form.answer) }}
+                            {{ form_errors(form.answer) }}
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1 text-primary"></i>
+                                Provide a detailed, helpful answer
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form_label(form.category) }}
+                                    {{ form_widget(form.category) }}
+                                    {{ form_errors(form.category) }}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    {{ form_label(form.displayOrder) }}
+                                    {{ form_widget(form.displayOrder) }}
+                                    {{ form_errors(form.displayOrder) }}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1 text-primary"></i>
+                                        Lower numbers appear first
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form_widget(form.isPublished) }}
+                                {{ form_label(form.isPublished) }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('app_admin_faq') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                            {{ form_widget(form.save) }}
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">FAQ Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Be concise</strong>
+                                    <p class="text-muted small mb-0">Keep questions short and to the point.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Use real questions</strong>
+                                    <p class="text-muted small mb-0">Base FAQs on real user inquiries.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Provide solutions</strong>
+                                    <p class="text-muted small mb-0">Answers should solve problems, not just provide information.</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                <div>
+                                    <strong>Use plain language</strong>
+                                    <p class="text-muted small mb-0">Avoid jargon and technical terms when possible.</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Categories</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3 small">Select the most relevant category for your FAQ. This helps users find information more easily.</p>
+                    
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>General</span>
+                            <span class="badge bg-primary rounded-pill">Platform basics</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Account</span>
+                            <span class="badge bg-primary rounded-pill">Profile & settings</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Sessions</span>
+                            <span class="badge bg-primary rounded-pill">Skill exchanges</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Skills</span>
+                            <span class="badge bg-primary rounded-pill">Skill management</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Technical</span>
+                            <span class="badge bg-primary rounded-pill">Technical issues</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Billing</span>
+                            <span class="badge bg-primary rounded-pill">Premium features</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

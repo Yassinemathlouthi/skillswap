@@ -30,6 +30,27 @@ class Session
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateTime = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $duration = 60; // Default duration of 60 minutes
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $location = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $longitude = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $reminderSent = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $reminderMinutesBefore = 30; // Default reminder 30 minutes before
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $calendarEventId = null; // For external calendar IDs
+
     #[ORM\Column(length: 20)]
     private ?string $status = self::STATUS_PENDING;
 
@@ -92,6 +113,90 @@ class Session
         return $this;
     }
 
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): static
+    {
+        $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): static
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    public function isReminderSent(): ?bool
+    {
+        return $this->reminderSent;
+    }
+
+    public function setReminderSent(?bool $reminderSent): static
+    {
+        $this->reminderSent = $reminderSent;
+
+        return $this;
+    }
+
+    public function getReminderMinutesBefore(): ?int
+    {
+        return $this->reminderMinutesBefore;
+    }
+
+    public function setReminderMinutesBefore(?int $reminderMinutesBefore): static
+    {
+        $this->reminderMinutesBefore = $reminderMinutesBefore;
+
+        return $this;
+    }
+
+    public function getCalendarEventId(): ?string
+    {
+        return $this->calendarEventId;
+    }
+
+    public function setCalendarEventId(?string $calendarEventId): static
+    {
+        $this->calendarEventId = $calendarEventId;
+
+        return $this;
+    }
+
     public function getStatus(): ?string
     {
         return $this->status;
@@ -150,5 +255,32 @@ class Session
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * Get the end time of the session based on start time and duration
+     */
+    public function getEndTime(): ?\DateTimeInterface
+    {
+        if (!$this->dateTime || !$this->duration) {
+            return null;
+        }
+
+        $endTime = clone $this->dateTime;
+        $endTime->modify("+{$this->duration} minutes");
+        
+        return $endTime;
+    }
+
+    /**
+     * Check if a session is upcoming
+     */
+    public function isUpcoming(): bool
+    {
+        if (!$this->dateTime) {
+            return false;
+        }
+        
+        return $this->dateTime > new \DateTime();
     }
 } 

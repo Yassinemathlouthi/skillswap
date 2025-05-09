@@ -1,0 +1,118 @@
+{% extends 'help/help_base.html.twig' %}
+
+{% block help_content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <h1 class="h3 mb-0"><i class="fas fa-question-circle text-primary me-2"></i>Frequently Asked Questions</h1>
+        
+        {% if searchTerm %}
+            <a href="{{ path('app_help_faq') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>Clear Search
+            </a>
+        {% endif %}
+    </div>
+    <div class="card-body p-4">
+        {% if searchTerm %}
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-search me-2"></i>Showing results for: <strong>"{{ searchTerm }}"</strong>
+            </div>
+        {% else %}
+            <p class="lead mb-4">Find answers to commonly asked questions about SkillSwap. Can't find what you're looking for? <a href="{{ path('app_help_contact') }}">Contact our support team</a>.</p>
+        {% endif %}
+        
+        {% if faqsByCategory is empty %}
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="fas fa-search text-muted fa-3x"></i>
+                </div>
+                <h5>No FAQs found</h5>
+                <p class="text-muted">We couldn't find any FAQs matching your search term.</p>
+                <a href="{{ path('app_help_faq') }}" class="btn btn-primary mt-2">
+                    <i class="fas fa-arrow-left me-1"></i>Back to All FAQs
+                </a>
+            </div>
+        {% else %}
+            <div class="accordion faq-accordion" id="faqAccordion">
+                {% for category, faqs in faqsByCategory %}
+                    <div class="accordion-item mb-4 border rounded-3 shadow-sm">
+                        <h2 class="accordion-header" id="heading{{ loop.index }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapse{{ loop.index }}">
+                                <i class="fas fa-folder me-2 text-primary"></i>{{ category }}
+                                <span class="badge bg-light text-dark ms-2">{{ faqs|length }}</span>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <div class="nested-accordion" id="category{{ loop.index }}Accordion">
+                                    {% for faq in faqs %}
+                                        <div class="card mb-3 border-0 shadow-sm">
+                                            <div class="card-header bg-light border-0">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link text-decoration-none text-start w-100 d-flex justify-content-between collapsed" data-bs-toggle="collapse" data-bs-target="#faq{{ faq.id }}" aria-expanded="false">
+                                                        <span>
+                                                            <i class="fas fa-question-circle me-2 text-primary"></i>{{ faq.question }}
+                                                        </span>
+                                                        <i class="fas fa-chevron-down transition-icon"></i>
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <div id="faq{{ faq.id }}" class="collapse" data-bs-parent="#category{{ loop.parent.loop.index }}Accordion">
+                                                <div class="card-body">
+                                                    <div class="faq-answer">
+                                                        {{ faq.answer|nl2br }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="mt-5 text-center">
+            <h5>Still have questions?</h5>
+            <p class="text-muted">Contact our support team and we'll be happy to help.</p>
+            <a href="{{ path('app_help_contact') }}" class="btn btn-primary">
+                <i class="fas fa-envelope me-2"></i>Contact Support
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.faq-accordion .accordion-button:not(.collapsed) {
+    background-color: rgba(76, 110, 245, 0.1);
+    color: var(--primary-color);
+    box-shadow: none;
+}
+
+.faq-accordion .accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(76, 110, 245, 0.5);
+}
+
+.faq-answer {
+    line-height: 1.7;
+}
+
+.transition-icon {
+    transition: transform 0.3s ease;
+}
+
+.collapsed .transition-icon {
+    transform: rotate(-90deg);
+}
+
+.btn-link {
+    color: var(--text-color);
+}
+
+.btn-link:hover {
+    color: var(--primary-color);
+}
+</style>
+{% endblock %} 

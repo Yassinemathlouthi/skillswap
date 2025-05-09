@@ -22,6 +22,74 @@ class SessionRepository extends ServiceEntityRepository
         parent::__construct($registry, Session::class);
     }
 
+    /**
+     * Find all sessions for a user (both as fromUser and toUser)
+     */
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.fromUser = :user OR s.toUser = :user')
+            ->setParameter('user', $user)
+            ->orderBy('s.dateTime', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find all upcoming sessions for a user
+     */
+    public function findUpcomingSessionsByUser(User $user): array
+    {
+        $now = new \DateTime();
+        
+        return $this->createQueryBuilder('s')
+            ->where('s.fromUser = :user OR s.toUser = :user')
+            ->andWhere('s.dateTime > :now')
+            ->andWhere('s.status != :canceled')
+            ->setParameter('user', $user)
+            ->setParameter('now', $now)
+            ->setParameter('canceled', Session::STATUS_CANCELED)
+            ->orderBy('s.dateTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find all sessions between a date range
+     */
+    public function findSessionsBetweenDates(User $user, \DateTime $startDate, \DateTime $endDate): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.fromUser = :user OR s.toUser = :user')
+            ->andWhere('s.dateTime >= :startDate')
+            ->andWhere('s.dateTime <= :endDate')
+            ->andWhere('s.status != :canceled')
+            ->setParameter('user', $user)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('canceled', Session::STATUS_CANCELED)
+            ->orderBy('s.dateTime', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Find sessions needing reminder notification
+     */
+    public function findSessionsNeedingReminder(\DateTime $now): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.status = :confirmed')
+            ->andWhere('s.reminderSent = :notSent OR s.reminderSent IS NULL')
+            ->andWhere('DATE_SUB(s.dateTime, s.reminderMinutesBefore, \'MINUTE\') <= :now')
+            ->andWhere('s.dateTime > :now')
+            ->setParameter('confirmed', Session::STATUS_CONFIRMED)
+            ->setParameter('notSent', false)
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
+    }
+
     public function save(Session $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
@@ -38,31 +106,5 @@ class SessionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-    }
-
-    public function findByUser(User $user): array
-    {
-        return $this->createQueryBuilder('s')
-            ->where('s.fromUser = :user OR s.toUser = :user')
-            ->setParameter('user', $user)
-            ->orderBy('s.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findUpcomingSessions(User $user): array
-    {
-        $now = new \DateTime();
-        
-        return $this->createQueryBuilder('s')
-            ->where('(s.fromUser = :user OR s.toUser = :user)')
-            ->andWhere('s.dateTime > :now')
-            ->andWhere('s.status IN (:statuses)')
-            ->setParameter('user', $user)
-            ->setParameter('now', $now)
-            ->setParameter('statuses', [Session::STATUS_PENDING, Session::STATUS_CONFIRMED])
-            ->orderBy('s.dateTime', 'ASC')
-            ->getQuery()
-            ->getResult();
     }
 } 

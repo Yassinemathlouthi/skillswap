@@ -10,6 +10,8 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -60,20 +62,33 @@ class SessionType extends AbstractType
         
         $builder
             ->add('dateTime', DateTimeType::class, [
-                'label' => 'Session Date and Time',
                 'widget' => 'single_text',
-                'html5' => true,
+                'label' => 'Date and Time',
+                'required' => true,
                 'attr' => [
-                    'min' => (new \DateTime('+1 hour'))->format('Y-m-d\TH:i'),
-                    'class' => 'form-control shadow-sm',
+                    'min' => (new \DateTime())->format('Y-m-d\TH:i'),
+                    'class' => 'form-control'
+                ]
+            ])
+            ->add('duration', IntegerType::class, [
+                'label' => 'Duration (minutes)',
+                'required' => false,
+                'attr' => [
+                    'min' => 15,
+                    'max' => 480,
+                    'step' => 15,
+                    'placeholder' => 'e.g. 60 minutes',
+                    'class' => 'form-control'
                 ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please select a date and time']),
-                    new GreaterThan([
-                        'value' => new \DateTime('+30 minutes'),
-                        'message' => 'The session date must be at least 30 minutes in the future'
-                    ]),
-                ],
+                'data' => 60, // Default 60 minutes
+            ])
+            ->add('location', TextType::class, [
+                'label' => 'Location (optional)',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Enter meeting location or "Online"',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('skill', EntityType::class, [
                 'class' => Skill::class,

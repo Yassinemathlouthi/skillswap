@@ -1,0 +1,204 @@
+{% extends 'help/help_base.html.twig' %}
+
+{% block help_content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h1 class="h3 mb-0"><i class="fas fa-envelope text-primary me-2"></i>Contact Support</h1>
+    </div>
+    <div class="card-body p-4">
+        <p class="lead">Need help with something specific? Our support team is here to assist you.</p>
+        
+        <div class="row g-4 mt-3">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4"><i class="fas fa-paper-plane text-primary me-2"></i>Send us a message</h5>
+                        
+                        <form id="contactForm" action="#" method="post">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fas fa-tag input-icon"></i>
+                                    <select class="form-select" id="subject" name="subject" required>
+                                        <option value="" selected disabled>Select a topic</option>
+                                        <option value="Account Issues">Account Issues</option>
+                                        <option value="Session Problems">Session Problems</option>
+                                        <option value="Technical Support">Technical Support</option>
+                                        <option value="Feature Request">Feature Request</option>
+                                        <option value="Report User">Report User</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Your Message</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4"><i class="fas fa-info-circle text-primary me-2"></i>Common questions</h5>
+                        
+                        <div class="mb-4">
+                            <div class="accordion" id="contactFAQ">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            How quickly will I get a response?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#contactFAQ">
+                                        <div class="accordion-body">
+                                            We strive to respond to all inquiries within 24-48 hours during business days. For urgent matters, please specify "Urgent" in your subject line.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingTwo">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            How do I report inappropriate behavior?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#contactFAQ">
+                                        <div class="accordion-body">
+                                            Select "Report User" in the subject dropdown and provide details about the incident, including usernames and dates. All reports are handled confidentially.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="headingThree">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            Can I request a new feature?
+                                        </button>
+                                    </h2>
+                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#contactFAQ">
+                                        <div class="accordion-body">
+                                            Yes! We welcome feature suggestions. Select "Feature Request" in the subject dropdown and describe the feature you'd like to see. We consider all suggestions for future updates.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4"><i class="fas fa-clock text-primary me-2"></i>Support hours</h5>
+                        
+                        <p>Our support team is available to help you during the following hours:</p>
+                        
+                        <ul class="list-unstyled">
+                            <li class="mb-2 d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-day me-2 text-muted"></i>Monday - Friday</span>
+                                <span class="fw-bold">9:00 AM - 6:00 PM EST</span>
+                            </li>
+                            <li class="mb-2 d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-day me-2 text-muted"></i>Saturday</span>
+                                <span class="fw-bold">10:00 AM - 4:00 PM EST</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-day me-2 text-muted"></i>Sunday</span>
+                                <span class="fw-bold">Closed</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="alert alert-info mt-4">
+                            <i class="fas fa-info-circle me-2"></i>For urgent matters outside of business hours, please use the emergency option in the support form.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+}
+
+.input-icon-wrapper .form-control,
+.input-icon-wrapper .form-select {
+    padding-left: 40px;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgba(76, 110, 245, 0.1);
+    color: var(--primary-color);
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(76, 110, 245, 0.5);
+}
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // This would be replaced with actual form submission logic
+                
+                // Show success message
+                const formContainer = contactForm.parentNode;
+                formContainer.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-success fa-4x"></i>
+                        </div>
+                        <h4 class="mb-3">Message Sent Successfully!</h4>
+                        <p class="text-muted">Thank you for contacting us. We'll get back to you as soon as possible.</p>
+                        <button class="btn btn-outline-primary mt-3" onclick="location.reload()">
+                            <i class="fas fa-paper-plane me-2"></i>Send Another Message
+                        </button>
+                    </div>
+                `;
+            });
+        }
+    });
+</script>
+{% endblock %} 

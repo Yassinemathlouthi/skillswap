@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\GeocodingService;
+use App\Service\CalendarService;
 
 #[Route('/sessions')]
 class SessionController extends AbstractController
@@ -59,7 +61,7 @@ class SessionController extends AbstractController
     }
     
     #[Route('/new/{username}', name: 'app_session_new')]
-    public function new(string $username, Request $request, UserRepository $userRepository, SkillRepository $skillRepository, SessionRepository $sessionRepository): Response
+    public function new(string $username, Request $request, UserRepository $userRepository, SkillRepository $skillRepository, SessionRepository $sessionRepository, GeocodingService $geocodingService): Response
     {
         // Ensure user is logged in
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -84,6 +86,13 @@ class SessionController extends AbstractController
         $session->setToUser($otherUser);
         $session->setStatus(Session::STATUS_PENDING);
         
+        // Set default location based on user preferences if available
+        if ($currentUser->getLatitude() && $currentUser->getLongitude()) {
+            $session->setLatitude($currentUser->getLatitude());
+            $session->setLongitude($currentUser->getLongitude());
+            $session->setLocation($currentUser->getLocation());
+        }
+        
         // Create and handle the form
         $form = $this->createForm(SessionType::class, $session, [
             'current_user' => $currentUser,
@@ -93,6 +102,20 @@ class SessionController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            // Check if a location string was provided and geocode it
+            $location = $session->getLocation();
+            if ($location && (!$session->getLatitude() || !$session->getLongitude())) {
+                try {
+                    $coordinates = $geocodingService->geocodeAddress($location);
+                    if ($coordinates) {
+                        $session->setLatitude($coordinates['latitude']);
+                        $session->setLongitude($coordinates['longitude']);
+                    }
+                } catch (\Exception $e) {
+                    // If geocoding fails, continue without coordinates
+                }
+            }
+            
             $sessionRepository->save($session, true);
             
             $this->addFlash('success', 'Session request sent successfully! You\'ll be notified when the user responds.');
@@ -206,5 +229,39 @@ class SessionController extends AbstractController
         $this->addFlash('info', 'Session has been canceled.');
         
         return $this->redirectToRoute('app_sessions');
+    }
+    
+    #[Route('/{id}/calendar', name: 'app_session_calendar')]
+    public function calendar(int $id, SessionRepository $sessionRepository, CalendarService $calendarService): Response
+    {
+        // Ensure user is logged in
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        
+        $session = $sessionRepository->find($id);
+        
+        if (!$session) {
+            throw $this->createNotFoundException('Session not found');
+        }
+        
+        // Ensure the current user is part of this session
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        if ($session->getFromUser()->getId() !== $currentUser->getId() && $session->getToUser()->getId() !== $currentUser->getId()) {
+            throw $this->createAccessDeniedException('You do not have access to this session');
+        }
+        
+        // Only confirmed sessions can be added to calendar
+        if ($session->getStatus() !== Session::STATUS_CONFIRMED) {
+            $this->addFlash('warning', 'Only confirmed sessions can be added to your calendar.');
+            return $this->redirectToRoute('app_session_view', ['id' => $id]);
+        }
+        
+        $googleCalendarUrl = $calendarService->generateGoogleCalendarUrl($session);
+        
+        return $this->render('session/calendar.html.twig', [
+            'session' => $session,
+            'current_user' => $currentUser,
+            'google_calendar_url' => $googleCalendarUrl,
+        ]);
     }
 } 

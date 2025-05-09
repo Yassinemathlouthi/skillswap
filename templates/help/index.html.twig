@@ -1,0 +1,191 @@
+{% extends 'help/help_base.html.twig' %}
+
+{% block help_content %}
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h1 class="card-title h3 mb-4"><i class="fas fa-info-circle text-primary me-2"></i>Welcome to the SkillSwap Help Center</h1>
+        
+        <p class="lead">Find answers to common questions and learn how to get the most out of SkillSwap.</p>
+        
+        <p>SkillSwap is a platform that connects people who want to exchange skills for free. Whether you're looking to teach what you know or learn something new, we're here to help facilitate that exchange.</p>
+        
+        <hr class="my-4">
+        
+        <h4 class="mb-3">How can we help you today?</h4>
+        
+        <div class="row g-4 mt-2">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex">
+                            <div class="icon-circle bg-primary-subtle text-primary me-3">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-2">Getting Started</h5>
+                                <p class="mb-0 text-muted">Learn the basics of SkillSwap and set up your profile.</p>
+                                <a href="{{ path('app_help_getting_started') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex">
+                            <div class="icon-circle bg-info-subtle text-info me-3">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-2">Frequently Asked Questions</h5>
+                                <p class="mb-0 text-muted">Find answers to common questions about SkillSwap.</p>
+                                <a href="{{ path('app_help_faq') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex">
+                            <div class="icon-circle bg-success-subtle text-success me-3">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-2">Best Practices</h5>
+                                <p class="mb-0 text-muted">Tips for successful skill exchanges and community guidelines.</p>
+                                <a href="{{ path('app_help_best_practices') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex">
+                            <div class="icon-circle bg-warning-subtle text-warning me-3">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-2">Contact Support</h5>
+                                <p class="mb-0 text-muted">Can't find what you need? Contact our support team.</p>
+                                <a href="{{ path('app_help_contact') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="card-title mb-0"><i class="fas fa-lightbulb me-2 text-warning"></i>Quick Tips</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0 me-3 text-primary">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Complete Your Profile</h6>
+                        <p class="text-muted small mb-0">A complete profile helps others understand your skills and increases your chances of finding matches.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0 me-3 text-primary">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Be Specific About Skills</h6>
+                        <p class="text-muted small mb-0">The more specific you are about skills you offer and want, the better matches you'll find.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0 me-3 text-primary">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Respond Promptly</h6>
+                        <p class="text-muted small mb-0">Responding quickly to messages and session requests helps build trust in the community.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0 me-3 text-primary">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">Share Your Experience</h6>
+                        <p class="text-muted small mb-0">After a skill exchange, leave constructive feedback to help others in the community.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(76, 110, 245, 0.15);
+}
+
+.bg-info-subtle {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+.bg-success-subtle {
+    background-color: rgba(16, 185, 129, 0.15);
+}
+
+.bg-warning-subtle {
+    background-color: rgba(245, 158, 11, 0.15);
+}
+
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+}
+</style>
+{% endblock %} 

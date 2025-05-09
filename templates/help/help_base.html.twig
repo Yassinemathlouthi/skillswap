@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Help Center - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="row g-4">
+    <!-- Sidebar Navigation -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-gradient-primary text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-life-ring me-2"></i>Help Center</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{{ path('app_help') }}" class="list-group-item list-group-item-action {% if current_page == 'overview' %}active{% endif %}">
+                    <i class="fas fa-home me-2"></i>Overview
+                </a>
+                <a href="{{ path('app_help_getting_started') }}" class="list-group-item list-group-item-action {% if current_page == 'getting_started' %}active{% endif %}">
+                    <i class="fas fa-rocket me-2"></i>Getting Started
+                </a>
+                <a href="{{ path('app_help_faq') }}" class="list-group-item list-group-item-action {% if current_page == 'faq' %}active{% endif %}">
+                    <i class="fas fa-question-circle me-2"></i>Frequently Asked Questions
+                </a>
+                <a href="{{ path('app_help_best_practices') }}" class="list-group-item list-group-item-action {% if current_page == 'best_practices' %}active{% endif %}">
+                    <i class="fas fa-star me-2"></i>Best Practices
+                </a>
+                <a href="{{ path('app_help_contact') }}" class="list-group-item list-group-item-action {% if current_page == 'contact' %}active{% endif %}">
+                    <i class="fas fa-envelope me-2"></i>Contact Support
+                </a>
+            </div>
+        </div>
+        
+        <div class="card bg-light border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="fas fa-search me-2 text-primary"></i>Quick Search</h5>
+                <form action="{{ path('app_help_faq') }}" method="get">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search help center...">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="col-lg-9">
+        {% block help_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %} 

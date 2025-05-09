@@ -1,0 +1,199 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Find Nearby Users - SkillSwap{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3"><i class="fas fa-map-marker-alt text-primary me-2"></i>Find Nearby Users</h1>
+        <div>
+            {% if not no_location %}
+                <a href="{{ path('app_nearby_map') }}" class="btn btn-primary">
+                    <i class="fas fa-map me-2"></i>View Map
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Your Location</h5>
+                </div>
+                <div class="card-body">
+                    {% if no_location %}
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Please set your location to find nearby users.
+                        </div>
+                    {% else %}
+                        <p class="mb-3">
+                            <i class="fas fa-map-pin text-primary me-2"></i>{{ app.user.location }}
+                            <br>
+                            <small class="text-muted">
+                                Coordinates: {{ app.user.latitude|round(4) }}, {{ app.user.longitude|round(4) }}
+                            </small>
+                        </p>
+                    {% endif %}
+                    
+                    <form action="{{ path('app_nearby_update_location') }}" method="post">
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Update your location</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="address" name="address" placeholder="Enter city, address, or postal code" required>
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-location-arrow"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">We use this to find skill exchanges near you.</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Filter</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ path('app_nearby') }}" method="get" id="filterForm">
+                        <div class="mb-3">
+                            <label for="radius" class="form-label">Distance (km)</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range flex-grow-1 me-2" id="radius" name="radius" min="5" max="500" step="5" value="{{ radius }}" oninput="this.nextElementSibling.value = this.value">
+                                <output>{{ radius }}</output>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Skills</label>
+                            <div class="skills-container border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                {% for skill in skills %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="{{ skill.id }}" id="skill{{ skill.id }}" name="skills[]" 
+                                            {% if skill.id in selectedSkills|map(s => s.id) %}checked{% endif %}>
+                                        <label class="form-check-label" for="skill{{ skill.id }}">
+                                            {{ skill.name }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            {% if no_location %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-map-marker-alt display-1 text-muted"></i>
+                        </div>
+                        <h3>Set Your Location</h3>
+                        <p class="text-muted mb-4">Please update your location to see nearby users who match your skills.</p>
+                        <p>Finding users near you makes it easier to arrange in-person skill exchanges.</p>
+                    </div>
+                </div>
+            {% else %}
+                {% if users is empty %}
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-users display-1 text-muted"></i>
+                            </div>
+                            <h3>No Users Found</h3>
+                            <p class="text-muted mb-4">We couldn't find any users matching your criteria within {{ radius }} km.</p>
+                            <p>Try increasing your search radius or modifying your skill filters.</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                            <h5 class="card-title mb-0">{{ users|length }} Users Found</h5>
+                            <div class="text-muted small">Within {{ radius }} km</div>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            {% for userWithDistance in users %}
+                                {% set user = userWithDistance[0] %}
+                                {% set distance = userWithDistance.distance|round(1) %}
+                                <div class="list-group-item p-3">
+                                    <div class="d-flex">
+                                        <!-- User avatar -->
+                                        <div class="flex-shrink-0 me-3">
+                                            {% if user.avatar %}
+                                                <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.username }}" class="rounded-circle" width="64" height="64">
+                                            {% else %}
+                                                <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; background-color: var(--primary-color); color: white;">
+                                                    {{ user.username|first|upper }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- User info -->
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <h5 class="mb-0 me-2">
+                                                    <a href="{{ path('app_profile_view', {'username': user.username}) }}" class="text-decoration-none stretched-link">
+                                                        {{ user.username }}
+                                                    </a>
+                                                </h5>
+                                                <span class="badge bg-primary">{{ distance }} km</span>
+                                            </div>
+                                            
+                                            <p class="text-muted mb-2">{{ user.bio|striptags|length > 100 ? user.bio|striptags|slice(0, 100) ~ '...' : user.bio|striptags }}</p>
+                                            
+                                            <!-- User skills -->
+                                            <div class="d-flex flex-wrap mt-2 gap-1">
+                                                {% if user.skillsOffered|length > 0 %}
+                                                    {% for skillOffered in user.skillsOffered|slice(0, 5) %}
+                                                        <span class="badge bg-success">{{ skillOffered.skill.name }}</span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                
+                                                {% if user.skillsWanted|length > 0 %}
+                                                    {% for skillWanted in user.skillsWanted|slice(0, 5) %}
+                                                        <span class="badge bg-secondary">{{ skillWanted.skill.name }}</span>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+}
+</style>
+{% endblock %} 
