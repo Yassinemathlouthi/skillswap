@@ -65,6 +65,36 @@ class ProfileController extends AbstractController
                     $user->setBio($bio);
                 }
                 
+                // Handle profile image upload
+                $profileImage = $request->files->get('profileImage');
+                if ($profileImage) {
+                    $originalFilename = pathinfo($profileImage->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Generate a safe filename using a simpler method that doesn't require intl extension
+                    $safeFilename = preg_replace('/[^A-Za-z0-9_]/', '', $originalFilename);
+                    $safeFilename = strtolower($safeFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$profileImage->guessExtension();
+                    
+                    // Move the file to the directory where profile images are stored
+                    try {
+                        $uploadsDirectory = $this->getParameter('kernel.project_dir').'/public/uploads/profiles';
+                        
+                        // Create directory if it doesn't exist
+                        if (!is_dir($uploadsDirectory)) {
+                            mkdir($uploadsDirectory, 0777, true);
+                        }
+                        
+                        $profileImage->move(
+                            $uploadsDirectory,
+                            $newFilename
+                        );
+                        
+                        // Store the path to the image in the user entity
+                        $user->setAvatar('uploads/profiles/'.$newFilename);
+                    } catch (\Exception $e) {
+                        $this->addFlash('danger', 'Error uploading profile image: ' . $e->getMessage());
+                    }
+                }
+                
                 $user->setUpdatedAt(new \DateTime());
                 $entityManager->flush();
                 
