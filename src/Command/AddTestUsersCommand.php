@@ -56,9 +56,9 @@ class AddTestUsersCommand extends Command
                 'latitude' => 33.8815, 
                 'longitude' => 10.0982,
                 'users' => [
-                    ['username' => 'gabes_dev1', 'email' => 'gabes1@example.com', 'firstName' => 'Ahmed', 'lastName' => 'Ben Ali'],
-                    ['username' => 'gabes_dev2', 'email' => 'gabes2@example.com', 'firstName' => 'Sarra', 'lastName' => 'Trabelsi'],
-                    ['username' => 'gabes_dev3', 'email' => 'gabes3@example.com', 'firstName' => 'Karim', 'lastName' => 'Mejri'],
+                    ['username' => 'gabes_dev1', 'email' => 'gabes1@gmail.com', 'firstName' => 'Ahmed', 'lastName' => 'Ben Ali'],
+                    ['username' => 'gabes_dev2', 'email' => 'gabes2@gmail.com', 'firstName' => 'Sarra', 'lastName' => 'Trabelsi'],
+                    ['username' => 'gabes_dev3', 'email' => 'gabes3@gmail.com', 'firstName' => 'Karim', 'lastName' => 'Mejri'],
                 ]
             ],
             [
@@ -66,9 +66,9 @@ class AddTestUsersCommand extends Command
                 'latitude' => 35.8245, 
                 'longitude' => 10.6346,
                 'users' => [
-                    ['username' => 'sousse_dev1', 'email' => 'sousse1@example.com', 'firstName' => 'Mohamed', 'lastName' => 'Sassi'],
-                    ['username' => 'sousse_dev2', 'email' => 'sousse2@example.com', 'firstName' => 'Leila', 'lastName' => 'Chaari'],
-                    ['username' => 'sousse_dev3', 'email' => 'sousse3@example.com', 'firstName' => 'Youssef', 'lastName' => 'Hamdi'],
+                    ['username' => 'sousse_dev1', 'email' => 'sousse1@gmail.com', 'firstName' => 'Mohamed', 'lastName' => 'Sassi'],
+                    ['username' => 'sousse_dev2', 'email' => 'sousse2@gmail.com', 'firstName' => 'Leila', 'lastName' => 'Chaari'],
+                    ['username' => 'sousse_dev3', 'email' => 'sousse3@gmail.com', 'firstName' => 'Youssef', 'lastName' => 'Hamdi'],
                 ]
             ]
         ];

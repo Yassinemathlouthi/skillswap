@@ -114,7 +114,7 @@ class ImportInitialDataCommand extends Command
             $users = [
                 [
                     'username' => 'admin',
-                    'email' => 'admin@example.com',
+                    'email' => 'admin@gmail.com',
                     'password' => 'admin123',
                     'roles' => json_encode(['ROLE_ADMIN', 'ROLE_USER']),
                     'first_name' => 'Admin',
@@ -122,7 +122,7 @@ class ImportInitialDataCommand extends Command
                 ],
                 [
                     'username' => 'john',
-                    'email' => 'john@example.com',
+                    'email' => 'john@gmail.com',
                     'password' => 'password123',
                     'roles' => json_encode(['ROLE_USER']),
                     'first_name' => 'John',
@@ -130,7 +130,7 @@ class ImportInitialDataCommand extends Command
                 ],
                 [
                     'username' => 'jane',
-                    'email' => 'jane@example.com',
+                    'email' => 'jane@gmail.com',
                     'password' => 'password123',
                     'roles' => json_encode(['ROLE_USER']),
                     'first_name' => 'Jane',
