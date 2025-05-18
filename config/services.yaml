@@ -10,6 +10,7 @@ parameters:
     db_name: 'skillswap'
     db_user: 'root'
     db_password: ''
+    grok_api_key: '%env(GROK_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -35,6 +36,12 @@ services:
     # DatabaseService for MySQL direct access
     App\Service\DatabaseService:
         arguments:
+            $params: '@parameter_bag'
+
+    # GrokService for AI chat
+    App\Service\GrokService:
+        arguments:
+            $httpClient: '@http_client'
             $params: '@parameter_bag'
 
     # DataSeederService registration

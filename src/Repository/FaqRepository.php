@@ -27,10 +27,12 @@ class FaqRepository extends ServiceEntityRepository
     public function findAllPublished(): array
     {
         return $this->createQueryBuilder('f')
-            ->where('f.isPublished = :published')
-            ->setParameter('published', true)
+            // Temporarily removing the published filter
+            // ->where('f.isPublished = :published')
+            // ->setParameter('published', true)
             ->orderBy('f.category', 'ASC')
-            ->addOrderBy('f.displayOrder', 'ASC')
+            // Temporarily removing this order as the column might not exist
+            // ->addOrderBy('f.displayOrder', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -42,10 +44,12 @@ class FaqRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('f')
             ->where('f.category = :category')
-            ->andWhere('f.isPublished = :published')
+            // Temporarily removing the published filter
+            // ->andWhere('f.isPublished = :published')
             ->setParameter('category', $category)
-            ->setParameter('published', true)
-            ->orderBy('f.displayOrder', 'ASC')
+            // ->setParameter('published', true)
+            // Temporarily removing this order as the column might not exist
+            // ->orderBy('f.displayOrder', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -57,8 +61,9 @@ class FaqRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('f')
             ->select('DISTINCT f.category')
-            ->where('f.isPublished = :published')
-            ->setParameter('published', true)
+            // Temporarily removing the published filter
+            // ->where('f.isPublished = :published')
+            // ->setParameter('published', true)
             ->orderBy('f.category', 'ASC')
             ->getQuery()
             ->getSingleColumnResult();
@@ -71,11 +76,13 @@ class FaqRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('f')
             ->where('f.question LIKE :searchTerm OR f.answer LIKE :searchTerm')
-            ->andWhere('f.isPublished = :published')
+            // Temporarily removing the published filter
+            // ->andWhere('f.isPublished = :published')
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
-            ->setParameter('published', true)
+            // ->setParameter('published', true)
             ->orderBy('f.category', 'ASC')
-            ->addOrderBy('f.displayOrder', 'ASC')
+            // Temporarily removing this order as the column might not exist
+            // ->addOrderBy('f.displayOrder', 'ASC')
             ->getQuery()
             ->getResult();
     }

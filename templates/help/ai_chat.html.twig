@@ -1,0 +1,302 @@
+{% extends 'help/help_base.html.twig' %}
+
+{% block help_content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0"><i class="fas fa-robot me-2"></i>AI Chat Assistant</h4>
+        <button id="clearChat" class="btn btn-sm btn-light">
+            <i class="fas fa-trash-alt me-1"></i>Clear Chat
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-4">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h5>AI-Powered Help</h5>
+                    <p class="mb-0">Ask any question about SkillSwap, and our AI assistant will provide you with instant answers. Try asking about how to use the platform, find skills, or set up sessions!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="mb-4 overflow-auto" style="height: 400px;">
+            <div class="message-container">
+                <div class="message assistant-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content bg-light rounded p-3">
+                        <p class="mb-0">Hello! I'm the SkillSwap AI assistant. How can I help you today?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <form id="chatForm" class="d-flex">
+                <input 
+                    type="text" 
+                    id="userMessage" 
+                    class="form-control form-control-lg me-2" 
+                    placeholder="Type your question here..." 
+                    autocomplete="off" 
+                    required
+                >
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Send
+                </button>
+            </form>
+            <div class="text-muted small mt-2">
+                <i class="fas fa-info-circle me-1"></i> Your questions are processed by an AI to provide the best help possible.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .message-container {
+        margin-bottom: 20px;
+    }
+    
+    .message {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    
+    .user-message {
+        flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+    }
+    
+    .user-message .message-avatar {
+        background-color: #6c757d;
+        margin-left: 10px;
+        margin-right: 0;
+    }
+    
+    .message-content {
+        max-width: 80%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .user-message .message-content {
+        background-color: #e9f0ff !important;
+    }
+    
+    #chatMessages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #chatMessages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    #chatMessages::-webkit-scrollbar-thumb {
+        background: #ddd;
+        border-radius: 4px;
+    }
+    
+    #chatMessages::-webkit-scrollbar-thumb:hover {
+        background: #ccc;
+    }
+    
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
+    }
+    
+    .typing-indicator span {
+        height: 8px;
+        width: 8px;
+        background-color: #007bff;
+        border-radius: 50%;
+        display: inline-block;
+        margin: 0 2px;
+        opacity: 0.6;
+        animation: typing 1s infinite;
+    }
+    
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes typing {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatForm = document.getElementById('chatForm');
+        const userMessageInput = document.getElementById('userMessage');
+        const chatMessages = document.getElementById('chatMessages');
+        const clearChatButton = document.getElementById('clearChat');
+        
+        // Store chat history in session storage
+        const chatHistory = JSON.parse(sessionStorage.getItem('skillswapChatHistory')) || [];
+        
+        // Load chat history
+        if (chatHistory.length > 0) {
+            chatHistory.forEach(message => {
+                addMessageToChat(message.role, message.content);
+            });
+            scrollToBottom();
+        }
+        
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const message = userMessageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessageToChat('user', message);
+            
+            // Store in chat history
+            chatHistory.push({ role: 'user', content: message });
+            sessionStorage.setItem('skillswapChatHistory', JSON.stringify(chatHistory));
+            
+            // Clear input
+            userMessageInput.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Scroll to bottom
+            scrollToBottom();
+            
+            // Send to server
+            fetch('{{ path('app_help_api_chat') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                // Add assistant response to chat
+                addMessageToChat('assistant', data.message);
+                
+                // Store in chat history
+                chatHistory.push({ role: 'assistant', content: data.message });
+                sessionStorage.setItem('skillswapChatHistory', JSON.stringify(chatHistory));
+                
+                // Scroll to bottom
+                scrollToBottom();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                removeTypingIndicator();
+                
+                // Friendly error message for users
+                const errorMessage = 'I apologize, but I\'m having trouble responding right now. This could be due to connectivity issues. Please try again in a moment or check out our FAQ section for help.';
+                addMessageToChat('assistant', errorMessage);
+                
+                // Store in chat history
+                chatHistory.push({ role: 'assistant', content: errorMessage });
+                sessionStorage.setItem('skillswapChatHistory', JSON.stringify(chatHistory));
+                
+                scrollToBottom();
+            });
+        });
+        
+        clearChatButton.addEventListener('click', function() {
+            // Clear chat display
+            chatMessages.innerHTML = '';
+            
+            // Clear chat history
+            sessionStorage.removeItem('skillswapChatHistory');
+            chatHistory.length = 0;
+            
+            // Add welcome message
+            addMessageToChat('assistant', 'Hello! I\'m the SkillSwap AI assistant. How can I help you today?');
+        });
+        
+        function addMessageToChat(role, content) {
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${role}-message`;
+            
+            const avatarElement = document.createElement('div');
+            avatarElement.className = 'message-avatar';
+            
+            const avatarIcon = document.createElement('i');
+            avatarIcon.className = role === 'user' ? 'fas fa-user' : 'fas fa-robot';
+            avatarElement.appendChild(avatarIcon);
+            
+            const contentElement = document.createElement('div');
+            contentElement.className = `message-content rounded p-3 ${role === 'user' ? 'bg-light' : 'bg-light'}`;
+            
+            const paragraph = document.createElement('p');
+            paragraph.className = 'mb-0';
+            paragraph.textContent = content;
+            
+            contentElement.appendChild(paragraph);
+            messageElement.appendChild(avatarElement);
+            messageElement.appendChild(contentElement);
+            messageContainer.appendChild(messageElement);
+            
+            chatMessages.appendChild(messageContainer);
+        }
+        
+        function showTypingIndicator() {
+            const typingContainer = document.createElement('div');
+            typingContainer.className = 'message-container typing-container';
+            typingContainer.innerHTML = `
+                <div class="message assistant-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content bg-light rounded p-3">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingContainer);
+        }
+        
+        function removeTypingIndicator() {
+            const typingContainer = document.querySelector('.typing-container');
+            if (typingContainer) {
+                typingContainer.remove();
+            }
+        }
+        
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    });
+</script>
+{% endblock %} 

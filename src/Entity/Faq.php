@@ -27,10 +27,10 @@ class Faq
     #[ORM\Column(length: 50)]
     private ?string $category = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $displayOrder = 0;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?bool $isPublished = true;
     
     #[ORM\Column]
@@ -90,7 +90,7 @@ class Faq
         return $this->displayOrder;
     }
 
-    public function setDisplayOrder(int $displayOrder): static
+    public function setDisplayOrder(?int $displayOrder): static
     {
         $this->displayOrder = $displayOrder;
 
@@ -102,7 +102,7 @@ class Faq
         return $this->isPublished;
     }
 
-    public function setIsPublished(bool $isPublished): static
+    public function setIsPublished(?bool $isPublished): static
     {
         $this->isPublished = $isPublished;
 
