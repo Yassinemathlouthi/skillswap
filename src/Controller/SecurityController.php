@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class SecurityController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         // Already logged in - redirect to dashboard
         if ($this->getUser()) {
@@ -27,6 +27,16 @@ class SecurityController extends AbstractController
         
         // Last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+        
+        // Add custom flash message for better user experience if there was an error
+        if ($error) {
+            // Log the error type for debugging
+            $errorType = get_class($error);
+            $errorMessage = $error->getMessage();
+            
+            // Add a more user-friendly flash message
+            $this->addFlash('error', 'Login failed. Please check your email and password and try again.');
+        }
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,

@@ -126,7 +126,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        // Store email in lowercase to ensure consistent case for authentication
+        $this->email = strtolower(trim($email));
 
         return $this;
     }

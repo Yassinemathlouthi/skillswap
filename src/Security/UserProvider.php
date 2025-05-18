@@ -25,7 +25,25 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $user = $this->userRepository->findByEmail($identifier);
+        // Normalize the identifier (email) to lowercase for case-insensitive matching
+        $normalizedIdentifier = strtolower(trim($identifier));
+        
+        // Find user by email using the normalized identifier
+        $user = $this->userRepository->findOneBy(['email' => $normalizedIdentifier]);
+        
+        // If not found with exact match, try case-insensitive search
+        if (!$user) {
+            // Find all users
+            $allUsers = $this->userRepository->findAll();
+            
+            // Check each user manually with case-insensitive comparison
+            foreach ($allUsers as $potentialUser) {
+                if (strtolower($potentialUser->getEmail()) === $normalizedIdentifier) {
+                    $user = $potentialUser;
+                    break;
+                }
+            }
+        }
         
         if (!$user) {
             throw new UserNotFoundException(sprintf('User with email "%s" not found.', $identifier));

@@ -135,7 +135,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function findByEmail(string $email): ?User
     {
-        return $this->findOneBy(['email' => $email]);
+        // Normalize email to lowercase
+        $normalizedEmail = strtolower(trim($email));
+        
+        // First try direct match
+        $user = $this->findOneBy(['email' => $normalizedEmail]);
+        
+        // If not found, try case-insensitive search using DQL
+        if (!$user) {
+            $user = $this->createQueryBuilder('u')
+                ->where('LOWER(u.email) = :email')
+                ->setParameter('email', $normalizedEmail)
+                ->getQuery()
+                ->getOneOrNullResult();
+        }
+        
+        return $user;
     }
 
     public function findByUsername(string $username): ?User
